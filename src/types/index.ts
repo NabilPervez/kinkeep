@@ -5,6 +5,7 @@ export interface Contact {
     phoneNumber: string;      // E.164 format ideally
     avatarColor?: string;     // UI Hex code
     avatarImage?: string;     // URL or base64
+    email?: string;           // Optional email address
 
     // Logic Fields
     frequencyDays: number;    // e.g., 7, 30, 90, 365
