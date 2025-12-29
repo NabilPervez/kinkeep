@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { db } from '../db/db';
 import { v4 as uuidv4 } from 'uuid';
+import { useLiveQuery } from 'dexie-react-hooks';
 
 export const AddContact: React.FC = () => {
     const navigate = useNavigate();
+    const { id } = useParams<{ id: string }>();
+
+    // Load existing data if editing
+    const existingContact = useLiveQuery(
+        () => (id ? db.contacts.get(id) : undefined),
+        [id]
+    );
+
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -13,23 +22,48 @@ export const AddContact: React.FC = () => {
         frequency: '30'
     });
 
+    // Populate form when data loads
+    useEffect(() => {
+        if (existingContact) {
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            setFormData({
+                firstName: existingContact.firstName,
+                lastName: existingContact.lastName,
+                phone: existingContact.phoneNumber,
+                birthday: existingContact.birthday || '',
+                frequency: existingContact.frequencyDays.toString()
+            });
+        }
+    }, [existingContact]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.firstName || !formData.lastName) return;
 
-        await db.contacts.add({
-            id: uuidv4(),
+        const contactData = {
             firstName: formData.firstName,
             lastName: formData.lastName,
             phoneNumber: formData.phone,
             frequencyDays: parseInt(formData.frequency),
-            lastContacted: Date.now(),
             birthday: formData.birthday || undefined,
-            isArchived: false,
-            tags: [],
-            // Random avatar color or default logic could go here
-        });
-        navigate('/');
+            // Preserve existing logic fields if editing
+            lastContacted: existingContact ? existingContact.lastContacted : Date.now(),
+            isArchived: existingContact ? existingContact.isArchived : false,
+            tags: existingContact ? existingContact.tags : [],
+        };
+
+        if (id) {
+            await db.contacts.update(id, contactData);
+        } else {
+            await db.contacts.add({
+                id: uuidv4(),
+                ...contactData,
+                lastContacted: Date.now(),
+                isArchived: false,
+                tags: [],
+            });
+        }
+        navigate(-1); // Go back
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -40,11 +74,11 @@ export const AddContact: React.FC = () => {
     return (
         <div className="flex-1 flex flex-col gap-6 p-4 pb-24">
             <header className="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm -mx-4 px-4 pb-2">
-                <div className="flex items-center justify-between pt-4 pb-2">
+                <div className="flex items-center justify-between px-4 pt-4 pb-2">
                     <button onClick={() => navigate(-1)} className="flex items-center justify-center size-10 -ml-2 rounded-full text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
                         <span className="material-symbols-outlined">arrow_back</span>
                     </button>
-                    <h1 className="text-lg font-bold leading-tight tracking-tight">Add Contact</h1>
+                    <h1 className="text-lg font-bold leading-tight tracking-tight">{id ? 'Edit Contact' : 'New Contact'}</h1>
                     <div className="size-10"></div>
                 </div>
             </header>

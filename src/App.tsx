@@ -4,7 +4,7 @@ import { Dashboard } from './pages/Dashboard';
 import { AddContact } from './pages/AddContact';
 import { ImportWizard } from './pages/ImportWizard';
 import { Templates } from './pages/Templates';
-// import { Contacts } from './pages/Contacts';
+import { Contacts } from './pages/Contacts';
 function App() {
   return (
     <Router>
@@ -12,9 +12,10 @@ function App() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/add-contact" element={<AddContact />} />
+          <Route path="/add-contact/:id" element={<AddContact />} />
           <Route path="/import" element={<ImportWizard />} />
           <Route path="/templates" element={<Templates />} />
-          <Route path="/contacts" element={<div className="p-4">Contacts (Coming Soon)</div>} />
+          <Route path="/contacts" element={<Contacts />} />
           <Route path="/settings" element={<div className="p-4">Settings (Coming Soon)</div>} />
         </Routes>
       </Layout>
