@@ -32,14 +32,11 @@ export const parseCSV = (file: File): Promise<ParseResult> => {
                             lastName: lastName || '',
                             phoneNumber: phone || '',
                             frequencyDays: 30, // Default to monthly
-                            lastContacted: Date.now(), // Assume caught up? Or maybe far back? Let's say today for "fresh start" or maybe 0? 
-                            // PRD says: "Go from Zero to organized". Let's assume we need to contact them.
-                            // Actually, if we import, we might want to start fresh. Let's set lastContacted to Date.now() so they aren't immediately overdue.
-                            // User story: "As a User, I want to import... so I don't clutter".
-                            // Let's default lastContacted to Date.now() (caught up) so the timer starts NOW.
-                            // UNLESS the CSV has a 'Last Contacted' field? Unlikely for generic exports.
+                            snoozedUntil: undefined,
+                            lastContacted: 0,
                             isArchived: false,
                             tags: ['Imported'],
+                            email: row['E-mail Address'] || row['Email'] || row['Email Address'] || ''
                         });
                     } else {
                         // Skip empty rows silently or log error
@@ -81,6 +78,7 @@ export const parseVCF = async (file: File): Promise<ParseResult> => {
         let firstName = '';
         let lastName = '';
         let phone = '';
+        let email = '';
         let fn = '';
 
         for (const line of lines) {
@@ -119,6 +117,17 @@ export const parseVCF = async (file: File): Promise<ParseResult> => {
                     }
                 }
             }
+
+            // Handle EMAIL field
+            if (trimmed.startsWith('EMAIL')) {
+                const colonIndex = trimmed.indexOf(':');
+                if (colonIndex !== -1) {
+                    const value = trimmed.substring(colonIndex + 1).trim();
+                    if (!email) {
+                        email = value;
+                    }
+                }
+            }
         }
 
         // Fallback for name if N fields were empty but FN exists
@@ -139,9 +148,10 @@ export const parseVCF = async (file: File): Promise<ParseResult> => {
                 lastName: lastName || '',
                 phoneNumber: phone || '',
                 frequencyDays: 30,
-                lastContacted: Date.now(),
+                lastContacted: 0,
                 isArchived: false,
                 tags: ['Imported'],
+                email: email || '',
             });
         }
     });

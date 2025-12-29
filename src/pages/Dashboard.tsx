@@ -35,15 +35,15 @@ export const Dashboard: React.FC = () => {
     const contactedToday = sortedContacts.filter(c => isToday(c.lastContacted));
     const snoozedContacts = sortedContacts.filter(c => c.snoozedUntil && c.snoozedUntil > now && !contactedToday.includes(c));
 
-    // Exclude contacted and snoozed from critical/upcoming
+    // Exclude contacted (handled) and snoozed from critical
     const criticalContacts = sortedContacts.filter(c =>
         (c.isBirthdayUpcoming || getNextDueDate(c) < now) &&
         !contactedToday.includes(c) &&
         !snoozedContacts.includes(c)
     );
+    // Include contactedToday in upcoming, but exclude snoozed
     const upcomingContacts = sortedContacts.filter(c =>
         !criticalContacts.includes(c) &&
-        !contactedToday.includes(c) &&
         !snoozedContacts.includes(c)
     );
 
@@ -81,7 +81,7 @@ export const Dashboard: React.FC = () => {
                             <span className="material-symbols-outlined text-[14px]">
                                 {c.isBirthdayUpcoming ? 'cake' : 'event'}
                             </span>
-                            {c.isBirthdayUpcoming ? 'Birthday' : (isSnoozed ? 'Snoozed' : (isContacted ? 'Contacted' : (isCritical ? 'Overdue' : 'Next')))}: {isSnoozed && c.snoozedUntil ? format(c.snoozedUntil, 'MMM d') : formatStatus(c)}
+                            {c.isBirthdayUpcoming ? 'Birthday' : (isSnoozed ? 'Snoozed' : (isCritical ? 'Overdue' : 'Next'))}: {isSnoozed && c.snoozedUntil ? format(c.snoozedUntil, 'MMM d') : formatStatus(c)}
                         </p>
                         {c.lastContacted > 0 && !isContacted && (
                             <p className="text-[10px] text-gray-300 dark:text-gray-600 flex items-center gap-1 mt-0.5">
@@ -174,21 +174,6 @@ export const Dashboard: React.FC = () => {
             ) : (
                 <main className="flex-1 overflow-y-auto no-scrollbar px-6 pt-4 pb-32 space-y-8">
 
-                    {/* Contacted Today Section */}
-                    {contactedToday.length > 0 && filter === 'All' && (
-                        <section className="animate-in slide-in-from-bottom-5 fade-in duration-500">
-                            <div className="flex items-center gap-2 mb-4">
-                                <h2 className="text-lg font-bold dark:text-white">Contacted Today</h2>
-                                <span className="flex h-5 items-center justify-center rounded-full bg-green-100 dark:bg-green-500/20 px-2 text-[10px] font-bold text-green-600 dark:text-green-400">
-                                    {contactedToday.length}
-                                </span>
-                            </div>
-                            <div className="space-y-3 opacity-80 hover:opacity-100 transition-opacity">
-                                {contactedToday.map(c => renderContactCard(c, false, true, false))}
-                            </div>
-                        </section>
-                    )}
-
                     {/* Snoozed Section */}
                     {snoozedContacts.length > 0 && filter === 'All' && (
                         <section className="animate-in slide-in-from-bottom-5 fade-in duration-500">
@@ -230,7 +215,7 @@ export const Dashboard: React.FC = () => {
                                             {label}
                                         </h3>
                                         <div className="space-y-3">
-                                            {contactsInGroup.map(c => renderContactCard(c, false))}
+                                            {contactsInGroup.map(c => renderContactCard(c, false, isToday(c.lastContacted)))}
                                         </div>
                                     </div>
                                 );

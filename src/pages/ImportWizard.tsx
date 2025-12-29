@@ -355,7 +355,7 @@ export const ImportWizard: React.FC = () => {
                                         </div>
                                         <div className="flex flex-col flex-1 min-w-0">
                                             <h4 className="text-base font-bold truncate text-gray-900 dark:text-white">{contact.firstName} {contact.lastName}</h4>
-                                            <p className="text-gray-500 text-xs truncate">{contact.phoneNumber || 'No Phone'}</p>
+                                            <p className="text-gray-500 text-xs truncate">{contact.phoneNumber || contact.email || 'No Contact Info'}</p>
                                         </div>
                                         <div className="shrink-0 pr-1">
                                             <div className={clsx("size-6 rounded-full border-2 flex items-center justify-center transition-colors",
