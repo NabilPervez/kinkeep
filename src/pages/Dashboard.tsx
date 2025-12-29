@@ -6,6 +6,7 @@ import { sortContacts } from '../utils/sorting';
 import clsx from 'clsx';
 import { ConnectModal } from '../components/ConnectModal';
 import { Onboarding } from '../components/Onboarding';
+import { getNextDueDate } from '../utils/dateUtils';
 import { sounds } from '../utils/sounds';
 // import { Contact } from '../types'; // Remove if not explicitly used, or use type import
 
@@ -41,7 +42,7 @@ export const Dashboard: React.FC = () => {
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const now = Date.now();
-    const criticalContacts = sortedContacts.filter(c => c.isBirthdayUpcoming || (c.lastContacted + (c.frequencyDays * 86400000) < now));
+    const criticalContacts = sortedContacts.filter(c => c.isBirthdayUpcoming || getNextDueDate(c) < now);
     const upcomingContacts = sortedContacts.filter(c => !criticalContacts.includes(c));
 
     // Dummy data fallback for UI testing if empty

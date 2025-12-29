@@ -16,6 +16,7 @@ export interface Contact {
     isArchived: boolean;
 
     tags: string[];           // ["Family", "Work"]
+    preferredDayOfWeek?: number; // 0 = Sunday, 1 = Monday, etc.
     notes?: string;
 
     // Computed fields (not necessarily in DB, but useful)

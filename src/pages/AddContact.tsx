@@ -4,6 +4,7 @@ import { db } from '../db/db';
 import { v4 as uuidv4 } from 'uuid';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { sounds } from '../utils/sounds';
+import clsx from 'clsx';
 
 export const AddContact: React.FC = () => {
     const navigate = useNavigate();
@@ -19,8 +20,9 @@ export const AddContact: React.FC = () => {
         firstName: '',
         lastName: '',
         phone: '',
+        frequency: '14', // Default to 2 weeks
         birthday: '',
-        frequency: '30'
+        preferredDayOfWeek: '' as string // "0"-"6" or ""
     });
 
     // Populate form when data loads
@@ -30,9 +32,10 @@ export const AddContact: React.FC = () => {
             setFormData({
                 firstName: existingContact.firstName,
                 lastName: existingContact.lastName,
-                phone: existingContact.phoneNumber,
+                phone: existingContact.phoneNumber || '',
+                frequency: existingContact.frequencyDays.toString(),
                 birthday: existingContact.birthday || '',
-                frequency: existingContact.frequencyDays.toString()
+                preferredDayOfWeek: existingContact.preferredDayOfWeek !== undefined ? existingContact.preferredDayOfWeek.toString() : ''
             });
         }
     }, [existingContact]);
@@ -47,6 +50,7 @@ export const AddContact: React.FC = () => {
             phoneNumber: formData.phone,
             frequencyDays: parseInt(formData.frequency),
             birthday: formData.birthday || undefined,
+            preferredDayOfWeek: formData.preferredDayOfWeek ? parseInt(formData.preferredDayOfWeek) : undefined,
             // Preserve existing logic fields if editing
             lastContacted: existingContact ? existingContact.lastContacted : Date.now(),
             isArchived: existingContact ? existingContact.isArchived : false,
@@ -159,31 +163,61 @@ export const AddContact: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="space-y-1.5 pt-2">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 ml-1" htmlFor="frequency">Keep in touch...</label>
-                        <div className="relative rounded-xl shadow-sm">
-                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                                <span className="material-symbols-outlined text-gray-400 text-[20px]">update</span>
-                            </div>
-                            <select
-                                name="frequency"
-                                value={formData.frequency}
-                                onChange={handleChange}
-                                className="block w-full rounded-xl border-gray-200 dark:border-white/10 bg-surface-light dark:bg-surface-dark text-gray-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-base py-3 pl-11 pr-10 appearance-none bg-none"
-                            >
-                                <option value="7">Every week</option>
-                                <option value="14">Every 2 weeks</option>
-                                <option value="30">Every month</option>
-                                <option value="90">Every 3 months</option>
-                                <option value="180">Every 6 months</option>
-                                <option value="365">Yearly</option>
-                            </select>
-                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
-                                <span className="material-symbols-outlined text-gray-400 text-[20px]">expand_more</span>
-                            </div>
-                        </div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 ml-1">We'll remind you to connect based on this schedule.</p>
+                    <div>
+                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">
+                            Check-in Frequency
+                        </label>
+                        <select
+                            name="frequency"
+                            value={formData.frequency}
+                            onChange={handleChange}
+                            className="w-full h-12 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 font-medium appearance-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                        >
+                            <option value="1">Daily</option>
+                            <option value="3">Every 3 Days</option>
+                            <option value="7">Weekly</option>
+                            <option value="14">Every 2 Weeks</option>
+                            <option value="30">Monthly</option>
+                            <option value="90">Every 3 Months</option>
+                            <option value="180">Every 6 Months</option>
+                            <option value="365">Yearly</option>
+                        </select>
                     </div>
+
+                    {/* Preferred Day - Only show for Weekly+ frequencies to avoid confusion */}
+                    {parseInt(formData.frequency) >= 7 && (
+                        <div className="animate-in fade-in slide-in-from-top-2">
+                            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">
+                                Preferred Day (Optional)
+                            </label>
+                            <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+                                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => (
+                                    <button
+                                        key={day}
+                                        type="button"
+                                        onClick={() => {
+                                            sounds.play('click');
+                                            setFormData(prev => ({
+                                                ...prev,
+                                                preferredDayOfWeek: prev.preferredDayOfWeek === idx.toString() ? '' : idx.toString()
+                                            }));
+                                        }}
+                                        className={clsx(
+                                            "h-10 rounded-lg text-xs font-bold transition-all border",
+                                            formData.preferredDayOfWeek === idx.toString()
+                                                ? "bg-black dark:bg-white text-white dark:text-black border-transparent shadow-md"
+                                                : "bg-surface-light dark:bg-surface-dark border-gray-200 dark:border-white/10 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10"
+                                        )}
+                                    >
+                                        {day}
+                                    </button>
+                                ))}
+                            </div>
+                            <p className="text-[10px] text-gray-400 mt-1.5 ml-1">
+                                We'll try to schedule follow-ups on this day.
+                            </p>
+                        </div>
+                    )}
 
                     <div className="fixed bottom-0 left-0 w-full z-40 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-t border-gray-200 dark:border-white/5 p-4 pb-safe">
                         <button className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-primary hover:bg-primary/90 text-black text-base font-bold shadow-[0_0_20px_rgba(70,236,19,0.3)] transition-all transform active:scale-[0.98]" type="submit">
