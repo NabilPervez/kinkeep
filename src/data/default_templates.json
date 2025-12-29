@@ -1,0 +1,50 @@
+[
+    {
+        "id": "uuid-1",
+        "category": "casual",
+        "text": "Hey {NAME}, long time no see! Coffee soon?",
+        "isDefault": true
+    },
+    {
+        "id": "uuid-2",
+        "category": "casual",
+        "text": "Thinking of you {NAME}, hope you're having a great week!",
+        "isDefault": true
+    },
+    {
+        "id": "uuid-3",
+        "category": "birthday",
+        "text": "Happy Birthday {NAME}! Hope you have an amazing day!",
+        "isDefault": true
+    },
+    {
+        "id": "uuid-4",
+        "category": "birthday",
+        "text": "Wishing you the best on your special day {NAME}!",
+        "isDefault": true
+    },
+    {
+        "id": "uuid-5",
+        "category": "formal",
+        "text": "Hello {NAME}, I hope this message finds you well.",
+        "isDefault": true
+    },
+    {
+        "id": "uuid-6",
+        "category": "formal",
+        "text": "Hi {NAME}, it's been a while. Would love to catch up professionally soon.",
+        "isDefault": true
+    },
+    {
+        "id": "uuid-7",
+        "category": "religious",
+        "text": "Salaam, Jummah Mubarak! Hope you have a blessed Friday.",
+        "isDefault": true
+    },
+    {
+        "id": "uuid-8",
+        "category": "religious",
+        "text": "Salaam {NAME}, keeping you in my duas. Hope all is well.",
+        "isDefault": true
+    }
+]

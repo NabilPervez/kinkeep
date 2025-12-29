@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 export const Templates: React.FC = () => {
     const navigate = useNavigate();
     const [filter, setFilter] = useState<'All' | 'Casual' | 'Birthday' | 'Formal' | 'Religious'>('All');
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
 
     // Simple state for creating new template (inline or modal? let's do inline for simplicity)
     const [isCreating, setIsCreating] = useState(false);
@@ -70,23 +71,92 @@ export const Templates: React.FC = () => {
         resetForm();
     };
 
+    const handleExport = async () => {
+        const allTemplates = await db.templates.toArray();
+        const json = JSON.stringify(allTemplates, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'kinkeep_templates.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        sounds.play('pop');
+    };
+
+    const handleImportClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (ev) => {
+            try {
+                const content = ev.target?.result as string;
+                const imported = JSON.parse(content);
+                if (!Array.isArray(imported)) throw new Error('Invalid format');
+
+                // Add with new IDs to avoid conflicts
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const newTemplates = imported.map((t: any) => ({
+                    ...t,
+                    id: uuidv4() // Always new ID
+                }));
+
+                await db.templates.bulkAdd(newTemplates);
+                sounds.play('success');
+                // clear input
+                if (fileInputRef.current) fileInputRef.current.value = '';
+            } catch (err) {
+                alert('Failed to import templates. Invalid JSON.');
+            }
+        };
+        reader.readAsText(file);
+    };
+
     return (
         <div className="flex-1 flex flex-col h-screen bg-background-light dark:bg-background-dark">
+            <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+                accept=".json"
+            />
             <header className="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-gray-200 dark:border-white/5 pb-2">
                 <div className="flex items-center justify-between px-6 pt-12 pb-2">
                     <button onClick={() => navigate(-1)} className="flex items-center justify-center size-10 -ml-2 rounded-full text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
                         <span className="material-symbols-outlined">arrow_back</span>
                     </button>
                     <h1 className="text-xl font-bold leading-tight tracking-tight dark:text-white">Templates</h1>
-                    <button
-                        onClick={() => {
-                            setIsCreating(true);
-                            sounds.play('click');
-                        }}
-                        className="flex items-center justify-center size-10 -mr-2 rounded-full bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all active:scale-95"
-                    >
-                        <span className="material-symbols-outlined">add</span>
-                    </button>
+                    <div className="flex gap-2 -mr-2">
+                        <button
+                            onClick={handleExport}
+                            className="flex items-center justify-center size-10 rounded-full bg-surface-light dark:bg-white/5 text-gray-900 dark:text-gray-300 transition-all hover:bg-gray-200 dark:hover:bg-white/10"
+                            title="Export Templates"
+                        >
+                            <span className="material-symbols-outlined text-[20px]">download</span>
+                        </button>
+                        <button
+                            onClick={handleImportClick}
+                            className="flex items-center justify-center size-10 rounded-full bg-surface-light dark:bg-white/5 text-gray-900 dark:text-gray-300 transition-all hover:bg-gray-200 dark:hover:bg-white/10"
+                            title="Import Templates"
+                        >
+                            <span className="material-symbols-outlined text-[20px]">upload</span>
+                        </button>
+                        <button
+                            onClick={() => {
+                                setIsCreating(true);
+                                sounds.play('click');
+                            }}
+                            className="flex items-center justify-center size-10 rounded-full bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all active:scale-95"
+                        >
+                            <span className="material-symbols-outlined">add</span>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Filter Chips */}
