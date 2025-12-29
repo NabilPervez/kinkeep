@@ -100,7 +100,15 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             </div>
 
             {/* Footer Actions */}
-            <div className="p-6 pb-safe">
+            <div className="p-6 pb-24 flex flex-col gap-3">
+                {current.secondaryLabel && (
+                    <button
+                        onClick={current.secondaryAction}
+                        className="w-full py-2 text-sm text-gray-400 dark:text-gray-500 font-bold hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                    >
+                        {current.secondaryLabel}
+                    </button>
+                )}
                 <button
                     onClick={current.action}
                     className="w-full h-14 rounded-2xl bg-primary text-black text-lg font-bold shadow-[0_4px_20px_rgba(70,236,19,0.3)] hover:bg-primary/90 hover:shadow-[0_4px_25px_rgba(70,236,19,0.4)] hover:-translate-y-0.5 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
@@ -108,17 +116,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                     {current.actionLabel}
                     <span className="material-symbols-outlined font-bold">arrow_forward</span>
                 </button>
-
-                {current.secondaryLabel ? (
-                    <button
-                        onClick={current.secondaryAction}
-                        className="w-full h-12 mt-3 rounded-xl text-gray-500 font-semibold hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
-                    >
-                        {current.secondaryLabel}
-                    </button>
-                ) : (
-                    <div className="h-12 mt-3"></div> // Spacer
-                )}
             </div>
         </div>
     );
