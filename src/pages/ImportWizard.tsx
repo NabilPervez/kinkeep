@@ -1,25 +1,55 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../db/db';
-import { parseCSV, parseVCF } from '../utils/fileParser'; // Implement this
+import { parseCSV, parseVCF } from '../utils/fileParser';
 import type { Contact } from '../types';
 import clsx from 'clsx';
+
+interface FrequencyStage {
+    label: string;
+    days: number;
+    description: string;
+}
+
+const STAGES: FrequencyStage[] = [
+    { label: 'Daily', days: 1, description: 'People you want to talk to every single day.' },
+    { label: '3 Days', days: 3, description: 'People you want to catch up with every few days.' },
+    { label: 'Weekly', days: 7, description: 'People you want to connect with once a week.' },
+    { label: 'Monthly', days: 30, description: 'People you want to verify relationships with once a month.' },
+    { label: 'Quarterly', days: 90, description: 'Close friends or family you see every season.' },
+    { label: 'Yearly', days: 365, description: 'Distant relatives or old friends to check in on annually.' },
+];
 
 export const ImportWizard: React.FC = () => {
     const navigate = useNavigate();
     const [step, setStep] = useState<1 | 2 | 3>(1);
-    // const [file, setFile] = useState<File | null>(null); // Unused state removed
-    const [parsedContacts, setParsedContacts] = useState<Contact[]>([]);
-    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-    const [isParsing, setIsParsing] = useState(false);
-    const [bulkFrequency, setBulkFrequency] = useState(30);
+    const [currentStageIndex, setCurrentStageIndex] = useState(0);
 
+    // All contacts parsed from file
+    const [parsedContacts, setParsedContacts] = useState<Contact[]>([]);
+
+    // IDs of contacts that have been assigned a frequency
+    const [processedIds, setProcessedIds] = useState<Set<string>>(new Set());
+
+    // IDs currently selected for the *current stage*
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+    // Final list of contacts to import with their assigned frequencies
+    const [finalImportList, setFinalImportList] = useState<Contact[]>([]);
+
+    const [isParsing, setIsParsing] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Derived: Contacts that haven't been processed yet
+    const remainingContacts = useMemo(() => {
+        return parsedContacts.filter(c => !processedIds.has(c.id));
+    }, [parsedContacts, processedIds]);
+
+    const currentStage = STAGES[currentStageIndex];
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const f = e.target.files[0];
-            // setFile(f); 
             await processFile(f);
         }
     };
@@ -31,7 +61,7 @@ export const ImportWizard: React.FC = () => {
             if (f.name.endsWith('.csv')) {
                 result = await parseCSV(f);
             } else if (f.name.endsWith('.vcf') || f.name.endsWith('.vcard')) {
-                result = await parseVCF(f); // To be improved
+                result = await parseVCF(f);
             } else {
                 alert("Unsupported file type");
                 setIsParsing(false);
@@ -40,10 +70,8 @@ export const ImportWizard: React.FC = () => {
 
             if (result && result.contacts.length > 0) {
                 setParsedContacts(result.contacts);
-                // Auto-select all by default for now, or maybe only those with phone numbers?
-                // Let's select all that have a valid looking name
-                const validIds = result.contacts.map(c => c.id);
-                setSelectedIds(new Set(validIds));
+                // Start with NO contacts selected
+                setSelectedIds(new Set());
                 setStep(2);
             } else {
                 alert("No contacts found in file.");
@@ -67,24 +95,61 @@ export const ImportWizard: React.FC = () => {
     };
 
     const toggleAll = () => {
-        if (selectedIds.size === parsedContacts.length) {
+        if (selectedIds.size === remainingContacts.length) {
             setSelectedIds(new Set());
         } else {
-            setSelectedIds(new Set(parsedContacts.map(c => c.id)));
+            setSelectedIds(new Set(remainingContacts.map(c => c.id)));
         }
     };
 
-    const handleImport = async () => {
-        const toImport = parsedContacts
-            .filter(c => selectedIds.has(c.id))
-            .map(c => ({
-                ...c,
-                frequencyDays: bulkFrequency // Apply bulk frequency setting
-            }));
+    const handleConfirmStage = () => {
+        const selectedContacts = remainingContacts.filter(c => selectedIds.has(c.id));
 
-        if (toImport.length === 0) return;
+        // Add selected to final list with current frequency
+        const newImportItems = selectedContacts.map(c => ({
+            ...c,
+            frequencyDays: currentStage.days
+        }));
 
-        await db.contacts.bulkAdd(toImport);
+        setFinalImportList(prev => [...prev, ...newImportItems]);
+
+        // Mark these IDs as processed so they disappear from the list
+        const newProcessed = new Set(processedIds);
+        selectedIds.forEach(id => newProcessed.add(id));
+        setProcessedIds(newProcessed);
+
+        // Clear selection for next stage
+        setSelectedIds(new Set());
+
+        // Move to next stage or finish
+        if (currentStageIndex < STAGES.length - 1) {
+            setCurrentStageIndex(prev => prev + 1);
+            // If no contacts left, we could arguably skip or just show empty list?
+            // User might want to skip stages even if contacts remain, so we just proceed.
+        } else {
+            // Finished all stages
+            setStep(3);
+        }
+    };
+
+    const handleNextSkipping = () => {
+        // User clicked "Next" without selecting anyone (or explicitly skipping)
+        // Just move to next stage without adding anyone from this stage
+        setSelectedIds(new Set());
+        if (currentStageIndex < STAGES.length - 1) {
+            setCurrentStageIndex(prev => prev + 1);
+        } else {
+            setStep(3);
+        }
+    };
+
+    const finalizeImport = async () => {
+        if (finalImportList.length === 0) {
+            alert("No contacts selected to import.");
+            return;
+        }
+
+        await db.contacts.bulkAdd(finalImportList);
         navigate('/');
     };
 
@@ -95,18 +160,42 @@ export const ImportWizard: React.FC = () => {
                 <div className="flex items-center justify-between px-4 py-4">
                     <button onClick={() => {
                         if (step === 1) navigate(-1);
-                        else setStep(prev => (prev - 1) as 1 | 2 | 3);
+                        else if (step === 2 && currentStageIndex > 0) {
+                            // Go back to previous stage (need to un-process contacts from that stage?)
+                            // This is complex. For now, simple back button resets or goes back to start?
+                            // Simplest: Go back to upload if step 2.
+                            // Or ideally, "Undo" last stage. 
+                            // Let's just allow going back to previous stage logic if feasible, 
+                            // but implementing 'undo' implies removing from finalImportList.
+                            // For simplicity given instructions, let's treat "Back" as "Cancel Flow" or go back to upload for now.
+                            // Or better: Allow aborting.
+                            if (confirm("Restart import process?")) {
+                                setStep(1);
+                                setParsedContacts([]);
+                                setProcessedIds(new Set());
+                                setFinalImportList([]);
+                                setCurrentStageIndex(0);
+                            }
+                        } else {
+                            navigate(-1);
+                        }
                     }} className="flex items-center justify-center size-10 rounded-full hover:bg-gray-200 dark:hover:bg-white/10 transition-colors -ml-2">
                         <span className="material-symbols-outlined">arrow_back</span>
                     </button>
                     <div className="flex flex-col items-center">
                         <h2 className="text-base font-bold leading-tight tracking-tight">
-                            {step === 1 ? 'Upload File' : 'Select Contacts'}
+                            {step === 1 ? 'Upload File' : step === 3 ? 'Complete Import' : `Assign: ${currentStage.label}`}
                         </h2>
-                        <div className="flex items-center gap-1 mt-0.5">
-                            <span className={clsx("h-1.5 w-1.5 rounded-full", step >= 1 ? "bg-primary" : "bg-gray-300 dark:bg-gray-600")}></span>
-                            <span className={clsx("h-1.5 w-1.5 rounded-full", step >= 2 ? "bg-primary" : "bg-gray-300 dark:bg-gray-600")}></span>
-                        </div>
+                        {step === 2 && (
+                            <div className="flex items-center gap-1 mt-1">
+                                {STAGES.map((_, idx) => (
+                                    <span key={idx} className={clsx(
+                                        "h-1.5 w-1.5 rounded-full transition-colors",
+                                        idx === currentStageIndex ? "bg-primary" : idx < currentStageIndex ? "bg-primary/50" : "bg-gray-300 dark:bg-gray-600"
+                                    )}></span>
+                                ))}
+                            </div>
+                        )}
                     </div>
                     <div className="w-10"></div>
                 </div>
@@ -134,45 +223,103 @@ export const ImportWizard: React.FC = () => {
                         {isParsing && <p className="text-primary font-bold animate-pulse">Parsing file...</p>}
 
                         <div className="max-w-xs text-center text-sm text-gray-500">
-                            <p>Export your contacts from Google, iCloud, or Outlook as a CSV or vCard file, then upload it here.</p>
+                            <p>Export your contacts from Google, iCloud, or Outlook as a CSV or vCard file.</p>
                         </div>
                     </div>
                 )}
 
                 {step === 2 && (
                     <div className="flex-1 flex flex-col min-h-0">
+                        {/* Stage Description */}
+                        <div className="mb-4 text-center px-4">
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{currentStage.label} ({currentStage.days} Day{currentStage.days > 1 ? 's' : ''})</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{currentStage.description}</p>
+                            <div className="mt-2 inline-flex items-center justify-center px-3 py-1 bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-white/10 rounded-full text-xs font-semibold">
+                                {remainingContacts.length} contacts remaining
+                            </div>
+                        </div>
+
                         {/* Search or Info (Optional) */}
                         <div className="flex justify-between items-center mb-2 px-1">
-                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Found {parsedContacts.length} Contacts</p>
+                            <label className="flex items-center gap-2 text-sm text-primary cursor-pointer hover:underline" onClick={toggleAll}>
+                                <div className={clsx("size-4 border rounded flex items-center justify-center", selectedIds.size === remainingContacts.length && remainingContacts.length > 0 ? "bg-primary border-primary text-black" : "border-gray-400")}>
+                                    {selectedIds.size === remainingContacts.length && remainingContacts.length > 0 && <span className="material-symbols-outlined text-[10px] font-bold">check</span>}
+                                </div>
+                                Select All for {currentStage.label}
+                            </label>
+                            <span className="text-xs text-gray-400">Selected: {selectedIds.size}</span>
                         </div>
 
                         {/* List */}
                         <div className="flex-1 overflow-y-auto no-scrollbar space-y-2 pb-32">
-                            {parsedContacts.map(contact => (
-                                <label key={contact.id} className={clsx(
-                                    "group flex items-center gap-3 p-3 bg-surface-light dark:bg-surface-dark rounded-xl border shadow-sm transition-all cursor-pointer",
-                                    selectedIds.has(contact.id) ? "border-primary/50" : "border-gray-100 dark:border-white/5 opacity-75 hover:opacity-100"
-                                )}>
-                                    <div className="relative shrink-0">
-                                        <div className="flex items-center justify-center rounded-full size-12 bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 font-bold text-lg">
-                                            {contact.firstName[0]}
+                            {remainingContacts.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center h-40 text-gray-400">
+                                    <span className="material-symbols-outlined text-4xl mb-2">done_all</span>
+                                    <p>No remaining contacts to assign!</p>
+                                </div>
+                            ) : (
+                                remainingContacts.map(contact => (
+                                    <label key={contact.id} className={clsx(
+                                        "group flex items-center gap-3 p-3 bg-surface-light dark:bg-surface-dark rounded-xl border shadow-sm transition-all cursor-pointer",
+                                        selectedIds.has(contact.id) ? "border-primary/50" : "border-gray-100 dark:border-white/5 opacity-75 hover:opacity-100"
+                                    )}>
+                                        <div className="relative shrink-0">
+                                            <div className="flex items-center justify-center rounded-full size-12 bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 font-bold text-lg">
+                                                {contact.firstName[0]}
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="flex flex-col flex-1 min-w-0">
-                                        <h4 className="text-base font-bold truncate">{contact.firstName} {contact.lastName}</h4>
-                                        <p className="text-gray-500 text-xs truncate">{contact.phoneNumber || 'No Phone'}</p>
-                                    </div>
-                                    <div className="shrink-0 pr-1">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedIds.has(contact.id)}
-                                            onChange={() => toggleSelection(contact.id)}
-                                            className="size-5 rounded border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-white/5 text-primary focus:ring-offset-0 focus:ring-primary transition-colors"
-                                        />
-                                    </div>
-                                </label>
-                            ))}
+                                        <div className="flex flex-col flex-1 min-w-0">
+                                            <h4 className="text-base font-bold truncate">{contact.firstName} {contact.lastName}</h4>
+                                            <p className="text-gray-500 text-xs truncate">{contact.phoneNumber || 'No Phone'}</p>
+                                        </div>
+                                        <div className="shrink-0 pr-1">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedIds.has(contact.id)}
+                                                onChange={() => toggleSelection(contact.id)}
+                                                className="size-5 rounded border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-white/5 text-primary focus:ring-offset-0 focus:ring-primary transition-colors"
+                                            />
+                                        </div>
+                                    </label>
+                                ))
+                            )}
                         </div>
+                    </div>
+                )}
+
+                {step === 3 && (
+                    <div className="flex-1 flex flex-col items-center justify-center gap-8 p-6 text-center">
+                        <div className="size-24 rounded-full bg-primary/20 flex items-center justify-center text-primary mb-4">
+                            <span className="material-symbols-outlined text-5xl">check_circle</span>
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-bold mb-2">All Set!</h2>
+                            <p className="text-gray-500">You have categorized {finalImportList.length} contacts.</p>
+                            {remainingContacts.length > 0 && (
+                                <p className="text-red-400 text-sm mt-2">
+                                    ({remainingContacts.length} contacts were not assigned and will be skipped)
+                                </p>
+                            )}
+                        </div>
+                        <div className="w-full max-w-sm bg-surface-light dark:bg-surface-dark rounded-xl p-4 text-left space-y-2 border border-white/5">
+                            {STAGES.map(stage => {
+                                const count = finalImportList.filter(c => c.frequencyDays === stage.days).length;
+                                if (count === 0) return null;
+                                return (
+                                    <div key={stage.label} className="flex justify-between text-sm">
+                                        <span className="text-gray-400">{stage.label}</span>
+                                        <span className="font-bold">{count}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        <button
+                            onClick={finalizeImport}
+                            className="w-full max-w-sm h-14 bg-primary hover:bg-primary/90 text-black font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2"
+                        >
+                            Import Contacts
+                            <span className="material-symbols-outlined">download_done</span>
+                        </button>
                     </div>
                 )}
             </main>
@@ -180,46 +327,26 @@ export const ImportWizard: React.FC = () => {
             {/* Footer Actions (Step 2 Only) */}
             {step === 2 && (
                 <section className="fixed bottom-0 w-full z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-t border-gray-200 dark:border-white/5 rounded-t-2xl shadow-[0_-5px_30px_rgba(0,0,0,0.1)] pb-safe">
-                    <div className="p-4 flex flex-col gap-5">
-                        <div className="flex flex-col gap-2">
-                            <div className="flex items-center justify-between">
-                                <label className="text-xs font-semibold text-gray-900 dark:text-white uppercase tracking-wide">Frequency for selected</label>
-                                <span className="text-xs text-primary font-medium">{bulkFrequency} Days</span>
-                            </div>
-                            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                                {[30, 90, 365, 7].map(freq => (
-                                    <button
-                                        key={freq}
-                                        onClick={() => setBulkFrequency(freq)}
-                                        className={clsx(
-                                            "shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors",
-                                            bulkFrequency === freq
-                                                ? "bg-primary text-black font-bold shadow-[0_0_10px_rgba(70,236,19,0.3)] border border-primary"
-                                                : "bg-white dark:bg-surface-dark border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5"
-                                        )}
-                                    >
-                                        {freq === 30 ? 'Monthly' : freq === 90 ? 'Quarterly' : freq === 7 ? 'Weekly' : 'Yearly'}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="h-px w-full bg-gray-200 dark:bg-white/10"></div>
+                    <div className="p-4 flex flex-col gap-4">
                         <div className="flex items-center gap-4">
-                            <label className="flex items-center gap-2.5 cursor-pointer pl-1 group">
-                                <input
-                                    type="checkbox"
-                                    checked={selectedIds.size === parsedContacts.length && parsedContacts.length > 0}
-                                    onChange={toggleAll}
-                                    className="size-5 rounded border-gray-300 dark:border-gray-500 text-primary focus:ring-primary bg-transparent"
-                                />
-                                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">Select All</span>
-                            </label>
                             <button
-                                onClick={handleImport}
-                                className="flex-1 h-12 bg-primary hover:bg-primary/90 active:scale-[0.98] text-black font-bold rounded-xl shadow-[0_4px_15px_rgba(70,236,19,0.2)] flex items-center justify-center gap-2 transition-all"
+                                onClick={handleNextSkipping}
+                                className="px-6 h-12 rounded-xl text-gray-500 font-medium hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
                             >
-                                Import {selectedIds.size} Contacts
-                                <span className="material-symbols-outlined text-[20px]">check</span>
+                                Skip
+                            </button>
+                            <button
+                                onClick={handleConfirmStage}
+                                disabled={selectedIds.size === 0}
+                                className={clsx(
+                                    "flex-1 h-12 font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg",
+                                    selectedIds.size > 0
+                                        ? "bg-primary hover:bg-primary/90 text-black shadow-[0_4px_15px_rgba(70,236,19,0.2)]"
+                                        : "bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed"
+                                )}
+                            >
+                                {selectedIds.size > 0 ? `Confirm ${selectedIds.size} for ${currentStage.label}` : 'Select Contacts'}
+                                {selectedIds.size > 0 && <span className="material-symbols-outlined text-[20px]">check</span>}
                             </button>
                         </div>
                     </div>
@@ -228,3 +355,4 @@ export const ImportWizard: React.FC = () => {
         </div>
     );
 };
+
