@@ -43,6 +43,9 @@ export const Dashboard: React.FC = () => {
                     <Link to="/add-contact" className="flex items-center justify-center size-10 rounded-full bg-surface-light dark:bg-surface-dark text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors shadow-sm">
                         <span className="material-symbols-outlined">add</span>
                     </Link>
+                    <Link to="/import" className="flex items-center justify-center size-10 rounded-full bg-surface-light dark:bg-surface-dark text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors shadow-sm ml-2">
+                        <span className="material-symbols-outlined">upload_file</span>
+                    </Link>
                 </div>
 
                 {/* Filter Chips */}
