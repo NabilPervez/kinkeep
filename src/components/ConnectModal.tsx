@@ -41,30 +41,48 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
 
     if (!contactId || !contact) return null;
 
-    const handleSend = () => {
+    const sanitizePhone = (phone: string) => {
+        // Remove all non-digits. If it starts with +, keep it? 
+        // WhatsApp needs country code. If user didn't enter it, we might have issues. 
+        // We assume user stores numbers in international format or local compatible.
+        return phone.replace(/[^0-9+]/g, '');
+    };
+
+    const handleSendVia = (app: 'sms' | 'whatsapp' | 'telegram') => {
         const template = templates.find(t => t.id === selectedTemplateId);
         const text = template ? template.text.replace('{NAME}', contact.firstName) : '';
+        const cleanPhone = sanitizePhone(contact.phoneNumber);
 
-        // Construct URI
-        // Detect OS for '?' vs '&' separator? 
-        // Modern iOS (15+) supports '?' well. Android usually '?'
-        // Standard: sms:12345678?body=Hello
+        let uri = '';
+        switch (app) {
+            case 'whatsapp':
+                // Check if number has country code? If not, WA might complain.
+                // We pass it raw sans symbols.
+                uri = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
+                break;
+            case 'telegram':
+                // Telegram handling. t.me/+number
+                // Telegram doesn't officially support pre-filling text via web link effortlessly for new chats.
+                // We will copy text to clipboard for them.
+                navigator.clipboard.writeText(text);
+                uri = `https://t.me/${cleanPhone.startsWith('+') ? cleanPhone : '+' + cleanPhone}`;
+                alert('Message text copied to clipboard! (Telegram does not support auto-fill)');
+                break;
+            case 'sms':
+            default:
+                // iOS uses & for separator in strict interpretation but ? is widely supported. 
+                // Let's use ? for broad compatibility.
+                uri = `sms:${contact.phoneNumber}?body=${encodeURIComponent(text)}`;
+                break;
+        }
 
-        const uri = `sms:${contact.phoneNumber}?body=${encodeURIComponent(text)}`;
         // eslint-disable-next-line react-hooks/rules-of-hooks
-        window.location.href = uri;
+        if (app !== 'telegram') {
+            // For non-telegram, we rely on the link opening. 
+            // Ideally we might copy for WA too if it fails? No, WA link is robust.
+        }
 
-        // Log interaction? 
-        // Ideally we ask: "Did you send it?" or auto-log.
-        // PRD says: "Tap Send (Opens native app)".
-        // Once they come back, we might want to log. But we can't detect return reliably.
-        // Let's Log "marked as done" automatically or ask?
-        // PRD: "Manually Logging... Or they called you? Tap Mark as Done".
-        // Use case 3-tap: Tap Reminder -> Tap Template -> Tap Send.
-        // Maybe we optimistically update lastContacted? 
-        // Let's Just open sms for now. The user can mark done on dashboard if they want, 
-        // OR better: Update lastContacted immediately when clicking "Send".
-        // Let's do that for friction reduction.
+        window.location.assign(uri);
 
         // eslint-disable-next-line react-hooks/rules-of-hooks
         db.contacts.update(contact.id, { lastContacted: Date.now() });
@@ -130,10 +148,17 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
                         Snooze
                     </button>
                     {selectedTemplateId ? (
-                        <button onClick={handleSend} className="flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-black font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98]">
-                            Send SMS
-                            <span className="material-symbols-outlined text-[18px]">send</span>
-                        </button>
+                        <div className="flex gap-2">
+                            <button onClick={() => handleSendVia('sms')} className="flex-1 flex items-center justify-center rounded-xl bg-primary text-black hover:bg-primary/90 transition-all font-bold group" title="SMS">
+                                <span className="material-symbols-outlined text-[20px]">sms</span>
+                            </button>
+                            <button onClick={() => handleSendVia('whatsapp')} className="flex-1 flex items-center justify-center rounded-xl bg-[#25D366] text-white hover:bg-[#25D366]/90 transition-all font-bold group" title="WhatsApp">
+                                <span className="material-symbols-outlined text-[20px]">chat</span>
+                            </button>
+                            <button onClick={() => handleSendVia('telegram')} className="flex-1 flex items-center justify-center rounded-xl bg-[#0088cc] text-white hover:bg-[#0088cc]/90 transition-all font-bold group" title="Telegram">
+                                <span className="material-symbols-outlined text-[20px]">send</span>
+                            </button>
+                        </div>
                     ) : (
                         <button onClick={handleMarkDone} className="flex items-center justify-center gap-2 py-3 rounded-xl bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 font-bold hover:bg-green-100 hover:text-green-700 dark:hover:bg-green-900/20 dark:hover:text-green-400 transition-colors">
                             <span className="material-symbols-outlined text-[18px]">check</span>
