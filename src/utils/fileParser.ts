@@ -1,5 +1,5 @@
 import Papa from 'papaparse';
-import VCardParser from 'vcard-parser';
+
 import { v4 as uuidv4 } from 'uuid';
 import type { Contact } from '../types';
 
@@ -57,75 +57,94 @@ export const parseCSV = (file: File): Promise<ParseResult> => {
 };
 
 export const parseVCF = async (file: File): Promise<ParseResult> => {
-    const text = await file.text();
-    const result = VCardParser.parse(text);
+    let text = '';
+    try {
+        text = await file.text();
+    } catch (e) {
+        return { contacts: [], errors: ['Failed to read file text'] };
+    }
+
     const contacts: Contact[] = [];
+    const errors: string[] = [];
 
-    // VCardParser returns an object where keys are not strictly array if single... 
-    // Actually vcard-parser output format varies by version. 
-    // Let's assume standard usage or debug if needed.
-    // However, vcard-parser typically returns an array of cards.
-    // Let's verify the library output structure if we could, but blindly:
-    // It usually parses into a list of cards.
+    // Normalize line endings
+    const normalizedText = text.replace(/\r\n/g, '\n');
 
-    // Using a simpler approach if the lib is complex, but let's try mapping.
-    // Ideally we iterate over the parsed cards.
+    // Split by BEGIN:VCARD
+    const cards = normalizedText.split('BEGIN:VCARD');
 
-    // Note: vcard-parser documentation says `.parse(string)` returns an object (single card) or array?
-    // Actually, many look for 'vcard-parser'.
-    // Let's look at a simpler manual parse if needed, but let's try iterating.
+    cards.forEach((cardContent) => {
+        if (!cardContent.trim()) return;
 
-    // If result is an array:
-    if (Array.isArray(result)) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        result.forEach((card: any) => {
-            // n is structured: { surname: ['...'], given: ['...'] } usually in json vcard
-            // or sometimes flat.
-            // Let's try to extract FN (Formatted Name) if N isn't perfect.
+        // Process each card
+        const lines = cardContent.split('\n');
+        let firstName = '';
+        let lastName = '';
+        let phone = '';
+        let fn = '';
 
-            const fn = card.fn ? (Array.isArray(card.fn) ? card.fn[0].value : card.fn.value) : '';
-            let given = '';
-            let family = '';
+        for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed) continue;
 
-            if (card.n) {
-                const nObj = Array.isArray(card.n) ? card.n[0].value : card.n.value;
-                // nObj might be "Doe;John;;;" string or object depending on parser config.
-                // 'vcard-parser' usually parses values well.
-                // Let's assume broad heuristic: use FN if N fails.
-                if (typeof nObj === 'string') {
-                    const parts = nObj.split(';');
-                    family = parts[0] || '';
-                    given = parts[1] || '';
-                } else if (typeof nObj === 'object') {
-                    // Check specific parser structure
+            // Handle N field
+            if (trimmed.startsWith('N:') || trimmed.startsWith('N;')) {
+                const colonIndex = trimmed.indexOf(':');
+                if (colonIndex !== -1) {
+                    const valuePart = trimmed.substring(colonIndex + 1);
+                    const parts = valuePart.split(';');
+                    lastName = parts[0]?.trim() || '';
+                    firstName = parts[1]?.trim() || '';
                 }
             }
 
-            if (!given && fn) {
-                const parts = fn.split(' ');
-                given = parts[0];
-                family = parts.slice(1).join(' ');
+            // Handle FN field
+            if (trimmed.startsWith('FN:') || trimmed.startsWith('FN;')) {
+                const colonIndex = trimmed.indexOf(':');
+                if (colonIndex !== -1) {
+                    fn = trimmed.substring(colonIndex + 1).trim();
+                }
             }
 
-            const tel = card.tel ? (Array.isArray(card.tel) ? card.tel[0].value : card.tel.value) : '';
-
-            if (given || family) {
-                contacts.push({
-                    id: uuidv4(),
-                    firstName: given || 'Friend',
-                    lastName: family || '',
-                    phoneNumber: tel || '',
-                    frequencyDays: 30,
-                    lastContacted: Date.now(),
-                    isArchived: false,
-                    tags: ['Imported'],
-                });
+            // Handle TEL field
+            if (trimmed.startsWith('TEL')) {
+                const isCell = trimmed.toUpperCase().includes('CELL');
+                const colonIndex = trimmed.indexOf(':');
+                if (colonIndex !== -1) {
+                    const value = trimmed.substring(colonIndex + 1).trim();
+                    if (isCell) {
+                        phone = value;
+                    } else if (!phone) {
+                        phone = value;
+                    }
+                }
             }
-        });
-    } else {
-        // Single card? or error?
-        // Let's assume array for bulk file.
-    }
+        }
 
-    return { contacts, errors: [] };
+        // Fallback for name if N fields were empty but FN exists
+        if (!firstName && !lastName && fn) {
+            const parts = fn.split(' ');
+            if (parts.length > 1) {
+                firstName = parts[0];
+                lastName = parts.slice(1).join(' ');
+            } else {
+                firstName = fn;
+            }
+        }
+
+        if (firstName || lastName) {
+            contacts.push({
+                id: uuidv4(),
+                firstName: firstName || 'Unknown',
+                lastName: lastName || '',
+                phoneNumber: phone || '',
+                frequencyDays: 30,
+                lastContacted: Date.now(),
+                isArchived: false,
+                tags: ['Imported'],
+            });
+        }
+    });
+
+    return { contacts, errors };
 };
