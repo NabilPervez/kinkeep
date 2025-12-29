@@ -6,6 +6,7 @@ import { sortContacts } from '../utils/sorting';
 import clsx from 'clsx';
 import { ConnectModal } from '../components/ConnectModal';
 import { Onboarding } from '../components/Onboarding';
+import { sounds } from '../utils/sounds';
 // import { Contact } from '../types'; // Remove if not explicitly used, or use type import
 
 export const Dashboard: React.FC = () => {
@@ -25,60 +26,75 @@ export const Dashboard: React.FC = () => {
     const showOnboarding = contacts.length === 0 && !hasSeenOnboarding;
 
     const handleOnboardingComplete = () => {
+        sounds.play('success');
         localStorage.setItem('kinKeep_onboarding_done', 'true');
         setHasSeenOnboarding(true);
     };
 
     /* 
     Filter Logic:
-    We filter purely for display sections below based on the 'filter' state.
-    'sortedContacts' is the master list.
+    - All: Show Critical (Overdue + Bday) first, then Upcoming.
+    - Birthdays: Show only contacts with birthday in next 30 days.
+    - Overdue: Show only overdue.
+    - Upcoming: Show only upcoming non-critical.
   */
 
-    const criticalContacts = sortedContacts.filter(c => (c.score || 0) > 0 || c.isBirthdayUpcoming);
-    const upcomingContacts = sortedContacts.filter(c => (c.score || 0) <= 0 && !c.isBirthdayUpcoming && (c.score || 0) > -100); // Filter out snoozed or far future if negative score logic changes
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const now = Date.now();
+    const criticalContacts = sortedContacts.filter(c => c.isBirthdayUpcoming || (c.lastContacted + (c.frequencyDays * 86400000) < now));
+    const upcomingContacts = sortedContacts.filter(c => !criticalContacts.includes(c));
 
     // Dummy data fallback for UI testing if empty
     const hasData = contacts.length > 0;
 
     return (
-        <div className="flex-1 flex flex-col gap-6 p-4 pb-24">
+        <div className="flex-1 flex flex-col h-screen bg-background-light dark:bg-background-dark">
             {/* Header */}
-            <header className="sticky top-0 z-40 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm -mx-4 px-4 pb-2">
-                <div className="flex items-center justify-between pt-4 pb-2">
-                    <div className="flex items-center gap-3">
-                        <div className="relative">
-                            <div className="bg-center bg-no-repeat bg-cover rounded-full size-10 ring-2 ring-primary/20 bg-gray-200" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDQe-l0A3Pm-KVgm7HUU2kSHdyLsRD3q0Gr4FqwC7MUsTSgbh3aTWEvt8c6cvdJV-2P0o7kVORsmnlIqCH-nTdtpDToOKItXDxhZy14_q49h8VidfqQFHmj0yDBD6Xv8rVfQDtWvH1sVfg0PIKNu0XPHXDBuPCLQW6O3uTH1-43NjNIMhFRhlp17444YjM6-7WSlaTwMb_dskKfuTttI0NTx38MVMA67cAqYSCYOYPHs77CBTKN-EuIznAMB9ttTuDROMl6kdOGKVSK")' }}>
-                            </div>
-                            <div className="absolute bottom-0 right-0 size-3 bg-primary rounded-full border-2 border-background-light dark:border-background-dark"></div>
+            <header className="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-gray-200 dark:border-white/5 pb-2">
+                <div className="flex items-center justify-between px-4 pt-4 pb-2">
+                    <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-center size-8 rounded-lg bg-primary text-black font-bold">
+                            <span className="material-symbols-outlined text-[20px]">favorite</span>
                         </div>
-                        <div>
-                            <h2 className="text-lg font-bold leading-tight tracking-tight">Good Morning</h2>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">You have {criticalContacts.length} critical updates</p>
-                        </div>
+                        <h1 className="text-xl font-black tracking-tight text-gray-900 dark:text-white">KinKeep</h1>
                     </div>
-                    <Link to="/add-contact" className="flex items-center justify-center size-10 rounded-full bg-surface-light dark:bg-surface-dark text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors shadow-sm">
-                        <span className="material-symbols-outlined">add</span>
-                    </Link>
-                    <Link to="/import" className="flex items-center justify-center size-10 rounded-full bg-surface-light dark:bg-surface-dark text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors shadow-sm ml-2">
-                        <span className="material-symbols-outlined">upload_file</span>
-                    </Link>
+                    <div className="flex gap-2">
+                        <Link
+                            to="/add-contact"
+                            onClick={() => sounds.play('click')}
+                            className="flex items-center px-3 h-10 rounded-full bg-primary text-black font-bold text-sm shadow-[0_0_15px_rgba(70,236,19,0.3)] hover:bg-primary/90 transition-all active:scale-95"
+                        >
+                            <span className="material-symbols-outlined text-[18px] mr-1">add</span>
+                            Add Contact
+                        </Link>
+                        <Link
+                            to="/import"
+                            onClick={() => sounds.play('click')}
+                            className="flex items-center justify-center size-10 rounded-full bg-surface-light dark:bg-surface-dark text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors shadow-sm active:scale-95"
+                        >
+                            <span className="material-symbols-outlined">upload_file</span>
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Filter Chips */}
-                <div className="flex gap-3 py-2 overflow-x-auto no-scrollbar">
-                    {(['All', 'Birthdays', 'Overdue', 'Upcoming'] as const).map((f) => (
+                <div className="px-4 pb-2 overflow-x-auto no-scrollbar flex gap-2">
+                    {['All', 'Birthdays', 'Overdue', 'Upcoming'].map(f => (
                         <button
                             key={f}
-                            onClick={() => setFilter(f)}
+                            onClick={() => {
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                setFilter(f as any);
+                                sounds.play('pop');
+                            }}
                             className={clsx(
-                                "flex h-8 shrink-0 items-center justify-center rounded-full px-4 transition-all",
+                                "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide transition-all whitespace-nowrap",
                                 filter === f
-                                    ? "bg-primary text-black font-semibold shadow-[0_0_10px_rgba(70,236,19,0.3)]"
-                                    : "bg-white dark:bg-surface-dark border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 font-medium"
+                                    ? "bg-black dark:bg-white text-white dark:text-black shadow-md"
+                                    : "bg-surface-light dark:bg-surface-dark text-gray-500 hover:bg-gray-200 dark:hover:bg-white/10"
                             )}
                         >
-                            <p className="text-sm">{f}</p>
+                            {f}
                         </button>
                     ))}
                 </div>

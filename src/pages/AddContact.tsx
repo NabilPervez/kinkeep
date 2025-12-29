@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { db } from '../db/db';
 import { v4 as uuidv4 } from 'uuid';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { sounds } from '../utils/sounds';
 
 export const AddContact: React.FC = () => {
     const navigate = useNavigate();
@@ -63,6 +64,7 @@ export const AddContact: React.FC = () => {
                 tags: [],
             });
         }
+        sounds.play('success');
         navigate(-1); // Go back
     };
 

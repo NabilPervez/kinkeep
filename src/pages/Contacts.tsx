@@ -4,6 +4,7 @@ import { db } from '../db/db';
 import { Link, useNavigate } from 'react-router-dom';
 import { ConnectModal } from '../components/ConnectModal'; // Re-use this for quick access
 import type { Contact } from '../types';
+import { sounds } from '../utils/sounds';
 
 export const Contacts: React.FC = () => {
     const navigate = useNavigate();
@@ -83,13 +84,21 @@ export const Contacts: React.FC = () => {
                                             </div>
                                             <div className="flex items-center gap-1">
                                                 <button
-                                                    onClick={(e) => { e.stopPropagation(); navigate(`/add-contact/${contact.id}`); }}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        sounds.play('click');
+                                                        navigate(`/add-contact/${contact.id}`);
+                                                    }}
                                                     className="size-8 flex items-center justify-center rounded-full text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
                                                 >
                                                     <span className="material-symbols-outlined text-[18px]">edit</span>
                                                 </button>
                                                 <button
-                                                    onClick={(e) => { e.stopPropagation(); setSelectedContactId(contact.id); }}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        sounds.play('pop');
+                                                        setSelectedContactId(contact.id);
+                                                    }}
                                                     className="size-8 flex items-center justify-center rounded-full text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
                                                 >
                                                     <span className="material-symbols-outlined text-[18px]">send</span>
