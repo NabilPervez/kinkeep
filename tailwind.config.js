@@ -8,14 +8,31 @@ export default {
   theme: {
     extend: {
       colors: {
-        "primary": "#46ec13",
-        "background-light": "#f6f8f6",
-        "background-dark": "#142210",
-        "surface-dark": "#1A2C15",
-        "surface-light": "#ffffff",
+        primary: {
+          DEFAULT: '#8B5CF6', // Violet
+          dark: '#7C3AED',
+          light: '#A78BFA',
+        },
+        secondary: {
+          DEFAULT: '#3B82F6', // Blue
+        },
+        background: {
+          light: '#F3F4F6',
+          dark: '#0F111A', // Deep Blue-Black
+        },
+        surface: {
+          light: '#FFFFFF',
+          dark: '#1E2130', // Lighter Blue-Black
+        }
       },
       fontFamily: {
-        "display": ["Inter", "sans-serif"]
+        display: ['Outfit', 'sans-serif'],
+        body: ['Inter', 'sans-serif'],
+      },
+      boxShadow: {
+        'neo-dark': '5px 5px 10px #0a0c12, -5px -5px 10px #22263e',
+        'neo-light': '5px 5px 10px #d1d5db, -5px -5px 10px #ffffff',
+        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
       },
       borderRadius: {
         "DEFAULT": "0.25rem",
