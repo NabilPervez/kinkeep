@@ -108,26 +108,11 @@ export const Dashboard: React.FC = () => {
                     </div>
                     <div className="flex gap-2">
                         <Link
-                            to="/add-contact"
-                            onClick={() => sounds.play('click')}
-                            className="flex items-center px-4 h-10 rounded-full bg-black dark:bg-white text-white dark:text-black font-bold text-sm shadow-lg hover:opacity-90 transition-all active:scale-95"
-                        >
-                            <span className="material-symbols-outlined text-[18px] mr-1">add</span>
-                            Add
-                        </Link>
-                        <Link
-                            to="/import"
+                            to="/settings"
                             onClick={() => sounds.play('click')}
                             className="flex items-center justify-center size-10 rounded-full bg-white dark:bg-white/10 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-white/20 transition-all shadow-sm border border-gray-200 dark:border-transparent active:scale-95"
                         >
-                            <span className="material-symbols-outlined">upload_file</span>
-                        </Link>
-                        <Link
-                            to="/templates"
-                            onClick={() => sounds.play('click')}
-                            className="flex items-center justify-center size-10 rounded-full bg-white dark:bg-white/10 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-white/20 transition-all shadow-sm border border-gray-200 dark:border-transparent active:scale-95"
-                        >
-                            <span className="material-symbols-outlined">description</span>
+                            <span className="material-symbols-outlined">settings</span>
                         </Link>
                     </div>
                 </div>

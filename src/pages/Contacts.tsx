@@ -39,9 +39,14 @@ export const Contacts: React.FC = () => {
             <header className="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-gray-200 dark:border-white/5 pb-2">
                 <div className="flex items-center justify-between px-4 pt-4 pb-2">
                     <h1 className="text-2xl font-black leading-tight tracking-tight">Contacts</h1>
-                    <Link to="/add-contact" className="flex items-center justify-center size-10 rounded-full bg-primary hover:bg-primary/90 text-black shadow-lg shadow-primary/20 transition-all active:scale-95">
-                        <span className="material-symbols-outlined font-bold">add</span>
-                    </Link>
+                    <div className="flex gap-2">
+                        <Link to="/import" className="flex items-center justify-center size-10 rounded-full bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10 text-gray-900 dark:text-white transition-all active:scale-95 shadow-sm">
+                            <span className="material-symbols-outlined font-bold">upload_file</span>
+                        </Link>
+                        <Link to="/add-contact" className="flex items-center justify-center size-10 rounded-full bg-primary hover:bg-primary/90 text-black shadow-lg shadow-primary/20 transition-all active:scale-95">
+                            <span className="material-symbols-outlined font-bold">add</span>
+                        </Link>
+                    </div>
                 </div>
                 <div className="px-4 pb-2">
                     <div className="relative">
