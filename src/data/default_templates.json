@@ -1,50 +1,116 @@
 [
     {
-        "id": "uuid-1",
-        "category": "casual",
-        "text": "Hey {NAME}, long time no see! Coffee soon?",
-        "isDefault": true
-    },
-    {
-        "id": "uuid-2",
-        "category": "casual",
-        "text": "Thinking of you {NAME}, hope you're having a great week!",
-        "isDefault": true
-    },
-    {
-        "id": "uuid-3",
-        "category": "birthday",
-        "text": "Happy Birthday {NAME}! Hope you have an amazing day!",
-        "isDefault": true
-    },
-    {
-        "id": "uuid-4",
-        "category": "birthday",
-        "text": "Wishing you the best on your special day {NAME}!",
-        "isDefault": true
-    },
-    {
-        "id": "uuid-5",
+        "id": "02912c2e-472f-4033-a56c-1d910c4409bf",
         "category": "formal",
-        "text": "Hello {NAME}, I hope this message finds you well.",
+        "text": "Hey {NAME}, was just thinking about you and wondering how work is going. What projects are keeping you busy lately?",
         "isDefault": true
     },
     {
-        "id": "uuid-6",
+        "id": "0b8fbe45-eedc-4815-97c5-ed1c4dfebe45",
+        "category": "birthday",
+        "text": "Happy Birthday, {NAME}! Hope you have a great one—doing anything fun to celebrate?",
+        "isDefault": true
+    },
+    {
+        "id": "0bc2ca86-4d1b-4eff-b091-8bc6a8df1038",
+        "category": "religious",
+        "text": "Salaam {NAME}, was just thinking about you and keeping you in my duas. How is the family doing?",
+        "isDefault": true
+    },
+    {
+        "id": "1b1f56c5-7199-4a94-8e36-60d97ba5ecd7",
+        "category": "religious",
+        "text": "Salaam and Jummah Mubarak! Thinking of you—hope you have a blessed Friday. Any big plans for the weekend?",
+        "isDefault": true
+    },
+    {
+        "id": "1b2d2c2b-af1f-44ad-b46f-0d8a75f96969",
+        "category": "religious",
+        "text": "As-salaamu alaykum, just checking in. May Allah bless your day. How are things going with you?",
+        "isDefault": true
+    },
+    {
+        "id": "3daa2134-9bbe-4105-9e4b-12e26798747c",
+        "category": "casual",
+        "text": "Hey {NAME}, was just thinking about you! We definitely need to catch up—are you free for coffee soon?",
+        "isDefault": true
+    },
+    {
+        "id": "4d40f17c-20a8-40b2-993d-7d1b5723873a",
         "category": "formal",
-        "text": "Hi {NAME}, it's been a while. Would love to catch up professionally soon.",
+        "text": "Hi {NAME}, thinking of you and sending my best. What have you been working on lately?",
         "isDefault": true
     },
     {
-        "id": "uuid-7",
-        "category": "religious",
-        "text": "Salaam, Jummah Mubarak! Hope you have a blessed Friday.",
+        "id": "60ad8cb6-8b92-4fa6-b106-e3de61394f59",
+        "category": "casual",
+        "text": "Salaam {NAME}! Was just thinking about you—it's been way too long. How is everything going in your world?",
         "isDefault": true
     },
     {
-        "id": "uuid-8",
+        "id": "65e6b748-9062-4959-92d7-1ddbc891e4bb",
         "category": "religious",
-        "text": "Salaam {NAME}, keeping you in my duas. Hope all is well.",
+        "text": "Salaam {NAME}, making dua for you and the family today. Everyone doing okay over there?",
+        "isDefault": true
+    },
+    {
+        "id": "824c6c45-28c9-4839-a6c7-bbba822eeeac",
+        "category": "religious",
+        "text": "Salaam! Was just thinking about you—hope you're having a peaceful week. What have you been up to?",
+        "isDefault": true
+    },
+    {
+        "id": "94436eb8-b20e-440d-b6b3-7f95917e7a82",
+        "category": "casual",
+        "text": "Yo {NAME}, what's good? Was just thinking about you. Let's link up soon—when are you free?",
+        "isDefault": true
+    },
+    {
+        "id": "ac904119-dfe6-43d1-9de8-3ebae588a3f0",
+        "category": "birthday",
+        "text": "Happy Birthday! Wishing you a year full of baraka. Did you get any cool gifts?",
+        "isDefault": true
+    },
+    {
+        "id": "ae9b0b68-10c0-4be9-bacf-baec8d00c15f",
+        "category": "formal",
+        "text": "Hello {NAME}, was just thinking about you. Hope you're doing well. How have you been lately?",
+        "isDefault": true
+    },
+    {
+        "id": "c8c8897d-0f26-435e-9aa0-96944678c745",
+        "category": "birthday",
+        "text": "Happy Birthday {NAME}! Hope you have an amazing day! Are you doing anything special tonight?",
+        "isDefault": true
+    },
+    {
+        "id": "d7adbeb7-eb6e-474c-bc26-92b967f1f19b",
+        "category": "casual",
+        "text": "Hi {NAME}, was just thinking about you! Read or watched anything good recently?",
+        "isDefault": true
+    },
+    {
+        "id": "f051f131-ee13-4b73-af07-bf19a16dd594",
+        "category": "birthday",
+        "text": "Happy B-day {NAME}! Let's celebrate soon. When are you free to grab a bite?",
+        "isDefault": true
+    },
+    {
+        "id": "f05ce151-62da-41a5-ad39-f741f6df8651",
+        "category": "religious",
+        "text": "Salaam {NAME}, Jummah Mubarak! Thinking of you and the family. How is everyone doing?",
+        "isDefault": true
+    },
+    {
+        "id": "f2a219cb-6d66-4ed2-b986-50561494743f",
+        "category": "casual",
+        "text": "Thinking of you, {NAME}! Hope the week is treating you well. What's new with you?",
+        "isDefault": true
+    },
+    {
+        "id": "fa57a99b-09e8-4ebd-b1ba-4ffdb3fc0c2d",
+        "category": "formal",
+        "text": "Hey {NAME}, thinking of you! Hope projects are going smoothly. What are you working on these days?",
         "isDefault": true
     }
 ]
