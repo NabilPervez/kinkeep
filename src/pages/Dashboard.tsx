@@ -5,14 +5,29 @@ import { db } from '../db/db';
 import { sortContacts } from '../utils/sorting';
 import clsx from 'clsx';
 import { ConnectModal } from '../components/ConnectModal';
+import { Onboarding } from '../components/Onboarding';
 // import { Contact } from '../types'; // Remove if not explicitly used, or use type import
 
 export const Dashboard: React.FC = () => {
     const [filter, setFilter] = useState<'All' | 'Birthdays' | 'Overdue' | 'Upcoming'>('All');
     const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
+    const [hasSeenOnboarding, setHasSeenOnboarding] = useState(() => {
+        return localStorage.getItem('kinKeep_onboarding_done') === 'true';
+    });
 
     const contacts = useLiveQuery(() => db.contacts.toArray()) || [];
     const sortedContacts = sortContacts(contacts);
+
+    // Show onboarding if no contacts AND not explicitly dismissed? 
+    // User request: "play if the user has not imported any contacts".
+    // Does that mean EVERY time? No.
+    // Let's use: If contacts == 0 AND !hasSeenOnboarding.
+    const showOnboarding = contacts.length === 0 && !hasSeenOnboarding;
+
+    const handleOnboardingComplete = () => {
+        localStorage.setItem('kinKeep_onboarding_done', 'true');
+        setHasSeenOnboarding(true);
+    };
 
     /* 
     Filter Logic:
@@ -165,6 +180,8 @@ export const Dashboard: React.FC = () => {
                     onClose={() => setSelectedContactId(null)}
                 />
             )}
+
+            {showOnboarding && <Onboarding onComplete={handleOnboardingComplete} />}
         </div>
     );
 };
