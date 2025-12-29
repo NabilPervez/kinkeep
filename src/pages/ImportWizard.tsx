@@ -183,49 +183,122 @@ export const ImportWizard: React.FC = () => {
     return (
         <div className="flex-1 flex flex-col h-screen bg-background-light dark:bg-background-dark">
             {/* Header */}
-            <header className="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-gray-200 dark:border-white/5">
-                <div className="flex items-center justify-between px-4 py-4">
-                    <button onClick={() => {
-                        if (step === 1) navigate(-1);
-                        else if (step === 2 && currentStageIndex > 0) {
-                            // Go back to previous stage (need to un-process contacts from that stage?)
-                            // This is complex. For now, simple back button resets or goes back to start?
-                            // Simplest: Go back to upload if step 2.
-                            // Or ideally, "Undo" last stage.
-                            // Let's just allow going back to previous stage logic if feasible,
-                            // but implementing 'undo' implies removing from finalImportList.
-                            // For simplicity given instructions, let's treat "Back" as "Cancel Flow" or go back to upload for now.
-                            // Or better: Allow aborting.
-                            if (confirm("Restart import process?")) {
-                                setStep(1);
-                                setParsedContacts([]);
-                                setProcessedIds(new Set());
-                                setFinalImportList([]);
-                                setCurrentStageIndex(0);
-                            }
-                        } else {
-                            navigate(-1);
-                        }
-                    }} className="flex items-center justify-center size-10 rounded-full hover:bg-gray-200 dark:hover:bg-white/10 transition-colors -ml-2">
-                        <span className="material-symbols-outlined">arrow_back</span>
-                    </button>
-                    <div className="flex flex-col items-center">
-                        <h2 className="text-base font-bold leading-tight tracking-tight">
-                            {step === 1 ? 'Upload File' : step === 3 ? 'Complete Import' : `Assign: ${currentStage.label}`}
-                        </h2>
-                        {step === 2 && (
-                            <div className="flex items-center gap-1 mt-1">
-                                {STAGES.map((_, idx) => (
-                                    <span key={idx} className={clsx(
-                                        "h-1.5 w-1.5 rounded-full transition-colors",
-                                        idx === currentStageIndex ? "bg-primary" : idx < currentStageIndex ? "bg-primary/50" : "bg-gray-300 dark:bg-gray-600"
-                                    )}></span>
-                                ))}
-                            </div>
-                        )}
+            <header className="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-gray-200 dark:border-white/5 transition-all">
+                {isSearchVisible && step === 2 ? (
+                    <div className="flex items-center gap-2 px-4 py-3 animate-in fade-in slide-in-from-top-2">
+                        <span className="material-symbols-outlined text-gray-400">search</span>
+                        <input
+                            autoFocus
+                            type="text"
+                            placeholder="Search names..."
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                            className="flex-1 bg-transparent border-none focus:ring-0 text-gray-900 dark:text-white placeholder-gray-400 p-0"
+                        />
+                        <button
+                            onClick={() => {
+                                setIsSearchVisible(false);
+                                setSearchQuery('');
+                            }}
+                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10"
+                        >
+                            <span className="material-symbols-outlined text-gray-500">close</span>
+                        </button>
                     </div>
-                    <div className="w-10"></div>
-                </div>
+                ) : (
+                    <div className="flex items-center justify-between px-4 py-3">
+                        {/* Left: Back */}
+                        <div className="flex-1 flex items-center justify-start">
+                            <button onClick={() => {
+                                if (step === 1) navigate(-1);
+                                else if (step === 2 && currentStageIndex > 0) {
+                                    if (confirm("Restart import process?")) {
+                                        setStep(1);
+                                        setParsedContacts([]);
+                                        setProcessedIds(new Set());
+                                        setFinalImportList([]);
+                                        setCurrentStageIndex(0);
+                                    }
+                                } else {
+                                    navigate(-1);
+                                }
+                            }} className="size-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-white/10 -ml-2 transition-colors text-gray-900 dark:text-white">
+                                <span className="material-symbols-outlined">arrow_back</span>
+                            </button>
+                        </div>
+
+                        {/* Center: Title */}
+                        <div className="flex-[2] flex flex-col items-center justify-center">
+                            <h2 className="text-base font-bold leading-tight tracking-tight text-gray-900 dark:text-white whitespace-nowrap">
+                                {step === 1 ? 'Upload File' : step === 3 ? 'Complete Import' : `Assign: ${currentStage.label}`}
+                            </h2>
+                            {step === 2 && (
+                                <div className="flex items-center gap-1 mt-1">
+                                    {STAGES.map((_, idx) => (
+                                        <span key={idx} className={clsx(
+                                            "h-1.5 w-1.5 rounded-full transition-colors",
+                                            idx === currentStageIndex ? "bg-primary" : idx < currentStageIndex ? "bg-primary/50" : "bg-gray-300 dark:bg-gray-600"
+                                        )}></span>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Right: Actions */}
+                        <div className="flex-1 flex items-center justify-end gap-1">
+                            {step === 2 && (
+                                <>
+                                    <button
+                                        onClick={() => setIsSearchVisible(true)}
+                                        className="size-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 transition-colors"
+                                    >
+                                        <span className="material-symbols-outlined text-[22px]">search</span>
+                                    </button>
+
+                                    {selectedIds.size > 0 ? (
+                                        <button
+                                            onClick={handleConfirmStage}
+                                            className="px-4 h-9 rounded-full bg-primary text-black font-bold text-sm shadow-sm hover:opacity-90 transition-all active:scale-95"
+                                        >
+                                            Save
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={handleNextSkipping}
+                                            className="px-3 h-9 rounded-full text-gray-500 font-medium text-sm hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+                                        >
+                                            Skip
+                                        </button>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* Sticky Sub-header for Step 2 */}
+                {step === 2 && !isSearchVisible && (
+                    <div className="px-4 pb-3 pt-1 border-t border-gray-100 dark:border-white/5 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm">
+                        <div className="text-center mb-2">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 px-4">{currentStage.description}</p>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <div className="inline-flex items-center px-2 py-0.5 bg-gray-100 dark:bg-white/5 rounded text-[10px] font-bold text-gray-500 uppercase tracking-wide">
+                                {remainingContacts.length} Left
+                            </div>
+                            <label className="flex items-center gap-2 text-sm text-primary font-bold cursor-pointer" onClick={toggleAll}>
+                                <div className={clsx("size-5 border-2 rounded flex items-center justify-center transition-all",
+                                    selectedIds.size === remainingContacts.length && remainingContacts.length > 0
+                                        ? "bg-primary border-primary text-black"
+                                        : "border-gray-300 dark:border-gray-600"
+                                )}>
+                                    {selectedIds.size === remainingContacts.length && remainingContacts.length > 0 && <span className="material-symbols-outlined text-[14px] font-bold">check</span>}
+                                </div>
+                                Select All
+                            </label>
+                        </div>
+                    </div>
+                )}
             </header>
 
             {/* Content */}
@@ -257,28 +330,8 @@ export const ImportWizard: React.FC = () => {
 
                 {step === 2 && (
                     <div className="flex-1 flex flex-col min-h-0">
-                        {/* Stage Description */}
-                        <div className="mb-4 text-center px-4">
-                            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{currentStage.label} ({currentStage.days} Day{currentStage.days > 1 ? 's' : ''})</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">{currentStage.description}</p>
-                            <div className="mt-2 inline-flex items-center justify-center px-3 py-1 bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-white/10 rounded-full text-xs font-semibold">
-                                {remainingContacts.length} contacts remaining
-                            </div>
-                        </div>
-
-                        {/* Actions Row (Select All) */}
-                        <div className="flex justify-between items-center mb-2 px-1">
-                            <label className="flex items-center gap-2 text-sm text-primary cursor-pointer hover:underline" onClick={toggleAll}>
-                                <div className={clsx("size-4 border rounded flex items-center justify-center", selectedIds.size === remainingContacts.length && remainingContacts.length > 0 ? "bg-primary border-primary text-black" : "border-gray-400")}>
-                                    {selectedIds.size === remainingContacts.length && remainingContacts.length > 0 && <span className="material-symbols-outlined text-[10px] font-bold">check</span>}
-                                </div>
-                                Select All
-                            </label>
-                            <span className="text-xs text-gray-400">Selected: {selectedIds.size}</span>
-                        </div>
-
                         {/* List */}
-                        <div className="flex-1 overflow-y-auto no-scrollbar space-y-2 pb-32">
+                        <div className="flex-1 overflow-y-auto no-scrollbar space-y-2 pb-10">
                             {remainingContacts.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center h-40 text-gray-400">
                                     <span className="material-symbols-outlined text-4xl mb-2">done_all</span>
@@ -286,26 +339,32 @@ export const ImportWizard: React.FC = () => {
                                 </div>
                             ) : (
                                 remainingContacts.map(contact => (
-                                    <label key={contact.id} className={clsx(
-                                        "group flex items-center gap-3 p-3 bg-surface-light dark:bg-surface-dark rounded-xl border shadow-sm transition-all cursor-pointer",
-                                        selectedIds.has(contact.id) ? "border-primary/50" : "border-gray-100 dark:border-white/5 opacity-75 hover:opacity-100"
-                                    )}>
+                                    <label key={contact.id}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            toggleSelection(contact.id);
+                                        }}
+                                        className={clsx(
+                                            "group flex items-center gap-3 p-3 bg-surface-light dark:bg-surface-dark rounded-xl border shadow-sm transition-all cursor-pointer",
+                                            selectedIds.has(contact.id) ? "border-primary/50 bg-primary/5" : "border-gray-100 dark:border-white/5 opacity-80 hover:opacity-100"
+                                        )}>
                                         <div className="relative shrink-0">
                                             <div className="flex items-center justify-center rounded-full size-12 bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 font-bold text-lg">
                                                 {contact.firstName[0]}
                                             </div>
                                         </div>
                                         <div className="flex flex-col flex-1 min-w-0">
-                                            <h4 className="text-base font-bold truncate">{contact.firstName} {contact.lastName}</h4>
+                                            <h4 className="text-base font-bold truncate text-gray-900 dark:text-white">{contact.firstName} {contact.lastName}</h4>
                                             <p className="text-gray-500 text-xs truncate">{contact.phoneNumber || 'No Phone'}</p>
                                         </div>
                                         <div className="shrink-0 pr-1">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedIds.has(contact.id)}
-                                                onChange={() => toggleSelection(contact.id)}
-                                                className="size-5 rounded border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-white/5 text-primary focus:ring-offset-0 focus:ring-primary transition-colors"
-                                            />
+                                            <div className={clsx("size-6 rounded-full border-2 flex items-center justify-center transition-colors",
+                                                selectedIds.has(contact.id)
+                                                    ? "bg-primary border-primary text-black"
+                                                    : "border-gray-300 dark:border-gray-600 bg-transparent"
+                                            )}>
+                                                {selectedIds.has(contact.id) && <span className="material-symbols-outlined text-[16px] font-bold">check</span>}
+                                            </div>
                                         </div>
                                     </label>
                                 ))
@@ -350,59 +409,6 @@ export const ImportWizard: React.FC = () => {
                     </div>
                 )}
             </main>
-
-            {/* Footer Actions (Step 2 Only) */}
-            {step === 2 && (
-                <section className="fixed bottom-0 w-full z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-t border-gray-200 dark:border-white/5 rounded-t-2xl shadow-[0_-5px_30px_rgba(0,0,0,0.1)] pb-safe">
-                    <div className="p-4 flex flex-col gap-4">
-                        {isSearchVisible ? (
-                            <div className="flex items-center gap-2 mb-2 animate-in slide-in-from-bottom-2 fade-in">
-                                <input
-                                    autoFocus
-                                    type="text"
-                                    placeholder="Search..."
-                                    value={searchQuery}
-                                    onChange={e => setSearchQuery(e.target.value)}
-                                    className="flex-1 h-12 rounded-xl bg-gray-100 dark:bg-white/10 px-4 border-none focus:ring-2 focus:ring-primary"
-                                />
-                                <button onClick={() => setIsSearchVisible(false)} className="size-12 rounded-xl bg-gray-200 dark:bg-white/5 flex items-center justify-center">
-                                    <span className="material-symbols-outlined">close</span>
-                                </button>
-                            </div>
-                        ) : null}
-
-                        <div className="flex items-center gap-4">
-                            {!isSearchVisible && (
-                                <button
-                                    onClick={() => setIsSearchVisible(true)}
-                                    className="size-12 rounded-xl bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-white/20 transition-colors"
-                                >
-                                    <span className="material-symbols-outlined">search</span>
-                                </button>
-                            )}
-                            <button
-                                onClick={handleNextSkipping}
-                                className="px-6 h-12 rounded-xl text-gray-500 font-medium hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
-                            >
-                                Skip
-                            </button>
-                            <button
-                                onClick={handleConfirmStage}
-                                disabled={selectedIds.size === 0}
-                                className={clsx(
-                                    "flex-1 h-12 font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg",
-                                    selectedIds.size > 0
-                                        ? "bg-primary hover:bg-primary/90 text-black shadow-[0_4px_15px_rgba(70,236,19,0.2)]"
-                                        : "bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed"
-                                )}
-                            >
-                                {selectedIds.size > 0 ? `Save` : 'Save'}
-                            </button>
-                        </div>
-                    </div>
-                </section>
-            )}
         </div>
     );
 };
-
