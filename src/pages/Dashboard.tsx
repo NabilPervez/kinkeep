@@ -177,15 +177,22 @@ export const Dashboard: React.FC = () => {
                         </section>
                     )}
 
-                    {/* Upcoming Section */}
+                    {/* Upcoming Section Grouped by Date */}
                     {upcomingContacts.length > 0 && (filter === 'All' || filter === 'Upcoming') && (
-                        <section className="animate-in slide-in-from-bottom-5 fade-in duration-700 delay-100">
-                            <div className="flex items-center gap-2 mb-4">
-                                <h2 className="text-lg font-bold dark:text-white">Upcoming</h2>
-                            </div>
-                            <div className="space-y-3">
-                                {upcomingContacts.map(c => renderContactCard(c, false))}
-                            </div>
+                        <section className="animate-in slide-in-from-bottom-5 fade-in duration-700 delay-100 flex flex-col gap-6">
+                            {Array.from(new Set(upcomingContacts.map(c => formatStatus(c)))).map(label => {
+                                const contactsInGroup = upcomingContacts.filter(c => formatStatus(c) === label);
+                                return (
+                                    <div key={label}>
+                                        <h3 className="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider pl-1 mb-3">
+                                            {label}
+                                        </h3>
+                                        <div className="space-y-3">
+                                            {contactsInGroup.map(c => renderContactCard(c, false))}
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </section>
                     )}
 
