@@ -1,6 +1,5 @@
 import Dexie, { type Table } from 'dexie';
 import type { Contact, Template } from '../types';
-import { v4 as uuidv4 } from 'uuid';
 
 export class KinKeepDB extends Dexie {
     contacts!: Table<Contact, string>;
