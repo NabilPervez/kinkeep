@@ -31,8 +31,21 @@ export const Dashboard: React.FC = () => {
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const now = Date.now();
-    const criticalContacts = sortedContacts.filter(c => c.isBirthdayUpcoming || getNextDueDate(c) < now);
-    const upcomingContacts = sortedContacts.filter(c => !criticalContacts.includes(c));
+
+    const contactedToday = sortedContacts.filter(c => isToday(c.lastContacted));
+    const snoozedContacts = sortedContacts.filter(c => c.snoozedUntil && c.snoozedUntil > now && !contactedToday.includes(c));
+
+    // Exclude contacted and snoozed from critical/upcoming
+    const criticalContacts = sortedContacts.filter(c =>
+        (c.isBirthdayUpcoming || getNextDueDate(c) < now) &&
+        !contactedToday.includes(c) &&
+        !snoozedContacts.includes(c)
+    );
+    const upcomingContacts = sortedContacts.filter(c =>
+        !criticalContacts.includes(c) &&
+        !contactedToday.includes(c) &&
+        !snoozedContacts.includes(c)
+    );
 
     const hasData = contacts.length > 0;
 
@@ -51,7 +64,7 @@ export const Dashboard: React.FC = () => {
         return format(due, 'MMM d');
     };
 
-    const renderContactCard = (c: Contact, isCritical: boolean) => (
+    const renderContactCard = (c: Contact, isCritical: boolean, isContacted: boolean = false, isSnoozed: boolean = false) => (
         <div key={c.id} className="p-4 rounded-2xl bg-white dark:bg-[#1E2130] border border-transparent dark:border-white/5 shadow-sm dark:shadow-neo-dark flex items-center justify-between group h-[88px]">
             <div className="flex items-center gap-4">
                 <div className="relative flex items-center justify-center size-12 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-white/5 dark:to-white/10 text-xl font-bold dark:text-gray-300 overflow-hidden shrink-0">
@@ -68,9 +81,9 @@ export const Dashboard: React.FC = () => {
                             <span className="material-symbols-outlined text-[14px]">
                                 {c.isBirthdayUpcoming ? 'cake' : 'event'}
                             </span>
-                            {c.isBirthdayUpcoming ? 'Birthday' : (isCritical ? 'Overdue' : 'Next')}: {formatStatus(c)}
+                            {c.isBirthdayUpcoming ? 'Birthday' : (isSnoozed ? 'Snoozed' : (isContacted ? 'Contacted' : (isCritical ? 'Overdue' : 'Next')))}: {isSnoozed && c.snoozedUntil ? format(c.snoozedUntil, 'MMM d') : formatStatus(c)}
                         </p>
-                        {c.lastContacted > 0 && (
+                        {c.lastContacted > 0 && !isContacted && (
                             <p className="text-[10px] text-gray-300 dark:text-gray-600 flex items-center gap-1 mt-0.5">
                                 <span className="material-symbols-outlined text-[10px]">history</span>
                                 {format(c.lastContacted, 'MMM d')}
@@ -79,20 +92,33 @@ export const Dashboard: React.FC = () => {
                     </div>
                 </div>
             </div>
-            <button
-                onClick={() => {
-                    setSelectedContactId(c.id);
-                    sounds.play('click');
-                }}
-                className={clsx(
-                    "size-10 rounded-full flex items-center justify-center shadow-sm transition-all active:scale-95",
-                    isCritical
-                        ? "bg-primary text-white shadow-primary/30"
-                        : "bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:bg-primary hover:text-white"
-                )}
-            >
-                <span className="material-symbols-outlined">send</span>
-            </button>
+            <div className="flex items-center gap-3">
+                {/* Visual Indicator */}
+                <div className={clsx(
+                    "size-6 flex items-center justify-center rounded-full border transition-colors",
+                    isContacted ? "bg-green-500 border-green-500 text-white" :
+                        isSnoozed ? "bg-orange-100 dark:bg-orange-900/20 border-orange-200 dark:border-orange-500/50 text-orange-500" :
+                            "border-gray-300 dark:border-gray-600 text-transparent"
+                )}>
+                    {isContacted && <span className="material-symbols-outlined text-[16px] font-bold">check</span>}
+                    {isSnoozed && <span className="material-symbols-outlined text-[16px]">snooze</span>}
+                </div>
+
+                <button
+                    onClick={() => {
+                        setSelectedContactId(c.id);
+                        sounds.play('click');
+                    }}
+                    className={clsx(
+                        "size-10 rounded-full flex items-center justify-center shadow-sm transition-all active:scale-95",
+                        isCritical
+                            ? "bg-primary text-white shadow-primary/30"
+                            : "bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:bg-primary hover:text-white"
+                    )}
+                >
+                    <span className="material-symbols-outlined">send</span>
+                </button>
+            </div>
         </div>
     );
 
@@ -147,6 +173,37 @@ export const Dashboard: React.FC = () => {
                 </div>
             ) : (
                 <main className="flex-1 overflow-y-auto no-scrollbar px-6 pt-4 pb-32 space-y-8">
+
+                    {/* Contacted Today Section */}
+                    {contactedToday.length > 0 && filter === 'All' && (
+                        <section className="animate-in slide-in-from-bottom-5 fade-in duration-500">
+                            <div className="flex items-center gap-2 mb-4">
+                                <h2 className="text-lg font-bold dark:text-white">Contacted Today</h2>
+                                <span className="flex h-5 items-center justify-center rounded-full bg-green-100 dark:bg-green-500/20 px-2 text-[10px] font-bold text-green-600 dark:text-green-400">
+                                    {contactedToday.length}
+                                </span>
+                            </div>
+                            <div className="space-y-3 opacity-80 hover:opacity-100 transition-opacity">
+                                {contactedToday.map(c => renderContactCard(c, false, true, false))}
+                            </div>
+                        </section>
+                    )}
+
+                    {/* Snoozed Section */}
+                    {snoozedContacts.length > 0 && filter === 'All' && (
+                        <section className="animate-in slide-in-from-bottom-5 fade-in duration-500">
+                            <div className="flex items-center gap-2 mb-4">
+                                <h2 className="text-lg font-bold dark:text-white">Snoozed</h2>
+                                <span className="flex h-5 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-500/20 px-2 text-[10px] font-bold text-orange-600 dark:text-orange-400">
+                                    {snoozedContacts.length}
+                                </span>
+                            </div>
+                            <div className="space-y-3 opacity-90">
+                                {snoozedContacts.map(c => renderContactCard(c, false, false, true))}
+                            </div>
+                        </section>
+                    )}
+
                     {/* Critical Section */}
                     {criticalContacts.length > 0 && (filter === 'All' || filter === 'Overdue' || filter === 'Birthdays') && (
                         <section className="animate-in slide-in-from-bottom-5 fade-in duration-500">
@@ -181,7 +238,7 @@ export const Dashboard: React.FC = () => {
                         </section>
                     )}
 
-                    {(criticalContacts.length === 0 && upcomingContacts.length === 0) && (
+                    {(criticalContacts.length === 0 && upcomingContacts.length === 0 && contactedToday.length === 0 && snoozedContacts.length === 0) && (
                         <div className="mt-10 flex flex-col items-center justify-center p-6 text-center opacity-60">
                             <span className="material-symbols-outlined text-4xl mb-2 text-gray-500">check_circle</span>
                             <p className="text-sm text-gray-500">You're all caught up for today!</p>

@@ -40,10 +40,29 @@ export const ImportWizard: React.FC = () => {
     const [isParsing, setIsParsing] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Derived: Contacts that haven't been processed yet
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isSearchVisible, setIsSearchVisible] = useState(false);
+
+    // Derived: Contacts that haven't been processed yet, filtered by search and sorted alphabetically
     const remainingContacts = useMemo(() => {
-        return parsedContacts.filter(c => !processedIds.has(c.id));
-    }, [parsedContacts, processedIds]);
+        let contacts = parsedContacts.filter(c => !processedIds.has(c.id));
+
+        // Filter by search
+        if (searchQuery.trim()) {
+            const lowerQuery = searchQuery.toLowerCase();
+            contacts = contacts.filter(c =>
+                c.firstName.toLowerCase().includes(lowerQuery) ||
+                c.lastName.toLowerCase().includes(lowerQuery)
+            );
+        }
+
+        // Sort alphabetically
+        return contacts.sort((a, b) => {
+            const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
+            const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
+            return nameA.localeCompare(nameB);
+        });
+    }, [parsedContacts, processedIds, searchQuery]);
 
     const currentStage = STAGES[currentStageIndex];
 
@@ -103,23 +122,30 @@ export const ImportWizard: React.FC = () => {
     };
 
     const handleConfirmStage = () => {
-        const selectedContacts = remainingContacts.filter(c => selectedIds.has(c.id));
+        // Find contacts selected in the current filtered view
+        // Note: Currently selectedIds might contain IDs not in visible view if search is active?
+        // Let's assume user operates on what they see or what they've selected.
+        // We need to move ALL selected IDs to processed, regardless of search view.
+
+        const contactsToMove = parsedContacts.filter(c => selectedIds.has(c.id));
 
         // Add selected to final list with current frequency
-        const newImportItems = selectedContacts.map(c => ({
+        const newImportItems = contactsToMove.map(c => ({
             ...c,
             frequencyDays: currentStage.days
         }));
 
         setFinalImportList(prev => [...prev, ...newImportItems]);
 
-        // Mark these IDs as processed so they disappear from the list
+        // Mark these IDs as processed
         const newProcessed = new Set(processedIds);
         selectedIds.forEach(id => newProcessed.add(id));
         setProcessedIds(newProcessed);
 
-        // Clear selection for next stage
+        // Clear selection and search for next stage
         setSelectedIds(new Set());
+        setSearchQuery('');
+        setIsSearchVisible(false);
 
         // Move to next stage or finish
         if (currentStageIndex < STAGES.length - 1) {
@@ -133,9 +159,10 @@ export const ImportWizard: React.FC = () => {
     };
 
     const handleNextSkipping = () => {
-        // User clicked "Next" without selecting anyone (or explicitly skipping)
-        // Just move to next stage without adding anyone from this stage
+        // Skip selecting anyone for this stage
         setSelectedIds(new Set());
+        setSearchQuery('');
+        setIsSearchVisible(false);
         if (currentStageIndex < STAGES.length - 1) {
             setCurrentStageIndex(prev => prev + 1);
         } else {
@@ -164,8 +191,8 @@ export const ImportWizard: React.FC = () => {
                             // Go back to previous stage (need to un-process contacts from that stage?)
                             // This is complex. For now, simple back button resets or goes back to start?
                             // Simplest: Go back to upload if step 2.
-                            // Or ideally, "Undo" last stage. 
-                            // Let's just allow going back to previous stage logic if feasible, 
+                            // Or ideally, "Undo" last stage.
+                            // Let's just allow going back to previous stage logic if feasible,
                             // but implementing 'undo' implies removing from finalImportList.
                             // For simplicity given instructions, let's treat "Back" as "Cancel Flow" or go back to upload for now.
                             // Or better: Allow aborting.
@@ -239,13 +266,13 @@ export const ImportWizard: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Search or Info (Optional) */}
+                        {/* Actions Row (Select All) */}
                         <div className="flex justify-between items-center mb-2 px-1">
                             <label className="flex items-center gap-2 text-sm text-primary cursor-pointer hover:underline" onClick={toggleAll}>
                                 <div className={clsx("size-4 border rounded flex items-center justify-center", selectedIds.size === remainingContacts.length && remainingContacts.length > 0 ? "bg-primary border-primary text-black" : "border-gray-400")}>
                                     {selectedIds.size === remainingContacts.length && remainingContacts.length > 0 && <span className="material-symbols-outlined text-[10px] font-bold">check</span>}
                                 </div>
-                                Select All for {currentStage.label}
+                                Select All
                             </label>
                             <span className="text-xs text-gray-400">Selected: {selectedIds.size}</span>
                         </div>
@@ -255,7 +282,7 @@ export const ImportWizard: React.FC = () => {
                             {remainingContacts.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center h-40 text-gray-400">
                                     <span className="material-symbols-outlined text-4xl mb-2">done_all</span>
-                                    <p>No remaining contacts to assign!</p>
+                                    <p>{searchQuery ? 'No contacts match search' : 'No remaining contacts to assign!'}</p>
                                 </div>
                             ) : (
                                 remainingContacts.map(contact => (
@@ -328,7 +355,31 @@ export const ImportWizard: React.FC = () => {
             {step === 2 && (
                 <section className="fixed bottom-0 w-full z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-t border-gray-200 dark:border-white/5 rounded-t-2xl shadow-[0_-5px_30px_rgba(0,0,0,0.1)] pb-safe">
                     <div className="p-4 flex flex-col gap-4">
+                        {isSearchVisible ? (
+                            <div className="flex items-center gap-2 mb-2 animate-in slide-in-from-bottom-2 fade-in">
+                                <input
+                                    autoFocus
+                                    type="text"
+                                    placeholder="Search..."
+                                    value={searchQuery}
+                                    onChange={e => setSearchQuery(e.target.value)}
+                                    className="flex-1 h-12 rounded-xl bg-gray-100 dark:bg-white/10 px-4 border-none focus:ring-2 focus:ring-primary"
+                                />
+                                <button onClick={() => setIsSearchVisible(false)} className="size-12 rounded-xl bg-gray-200 dark:bg-white/5 flex items-center justify-center">
+                                    <span className="material-symbols-outlined">close</span>
+                                </button>
+                            </div>
+                        ) : null}
+
                         <div className="flex items-center gap-4">
+                            {!isSearchVisible && (
+                                <button
+                                    onClick={() => setIsSearchVisible(true)}
+                                    className="size-12 rounded-xl bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-white/20 transition-colors"
+                                >
+                                    <span className="material-symbols-outlined">search</span>
+                                </button>
+                            )}
                             <button
                                 onClick={handleNextSkipping}
                                 className="px-6 h-12 rounded-xl text-gray-500 font-medium hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
@@ -345,8 +396,7 @@ export const ImportWizard: React.FC = () => {
                                         : "bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed"
                                 )}
                             >
-                                {selectedIds.size > 0 ? `Confirm ${selectedIds.size} for ${currentStage.label}` : 'Select Contacts'}
-                                {selectedIds.size > 0 && <span className="material-symbols-outlined text-[20px]">check</span>}
+                                {selectedIds.size > 0 ? `Save` : 'Save'}
                             </button>
                         </div>
                     </div>

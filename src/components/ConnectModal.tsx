@@ -38,6 +38,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
     });
 
     const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+    const [showEmailOptions, setShowEmailOptions] = useState(false);
 
     if (!contactId || !contact) return null;
 
@@ -48,7 +49,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
         return phone.replace(/[^0-9+]/g, '');
     };
 
-    const handleSendVia = (app: 'sms' | 'whatsapp' | 'telegram') => {
+    const handleSendVia = (app: 'sms' | 'whatsapp' | 'telegram' | 'email', provider: 'default' | 'gmail' | 'yahoo' = 'default') => {
         const template = templates.find(t => t.id === selectedTemplateId);
         const text = template ? template.text.replace('{NAME}', contact.firstName) : '';
         const cleanPhone = sanitizePhone(contact.phoneNumber);
@@ -68,6 +69,19 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
                 uri = `https://t.me/${cleanPhone.startsWith('+') ? cleanPhone : '+' + cleanPhone}`;
                 alert('Message text copied to clipboard! (Telegram does not support auto-fill)');
                 break;
+            case 'email':
+                // Email handling
+                // eslint-disable-next-line no-case-declarations
+                const subject = "Catching up";
+                if (provider === 'gmail') {
+                    uri = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(contact.email || '')}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
+                } else if (provider === 'yahoo') {
+                    uri = `https://compose.mail.yahoo.com/?to=${encodeURIComponent(contact.email || '')}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
+                } else {
+                    uri = `mailto:${contact.email || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
+                }
+                setShowEmailOptions(false);
+                break;
             case 'sms':
             default:
                 // iOS uses & for separator in strict interpretation but ? is widely supported. 
@@ -77,12 +91,11 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
         }
 
         // eslint-disable-next-line react-hooks/rules-of-hooks
-        if (app !== 'telegram') {
+        if (app !== 'telegram' && app !== 'email') {
             // For non-telegram, we rely on the link opening. 
-            // Ideally we might copy for WA too if it fails? No, WA link is robust.
         }
 
-        window.location.assign(uri);
+        if (uri) window.location.assign(uri);
 
         // eslint-disable-next-line react-hooks/rules-of-hooks
         db.contacts.update(contact.id, { lastContacted: Date.now() });
@@ -177,10 +190,9 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
                     </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
-                    <button onClick={handleSnooze} className="flex items-center justify-center gap-2 py-4 rounded-2xl bg-white dark:bg-[#252836] text-gray-700 dark:text-gray-300 font-bold hover:bg-gray-50 dark:hover:bg-white/5 transition-all shadow-sm dark:shadow-neo-dark active:scale-95">
-                        <span className="material-symbols-outlined text-[22px]">snooze</span>
-                        Snooze
+                <div className="grid grid-cols-[auto_1fr] gap-4 max-w-md mx-auto">
+                    <button onClick={handleSnooze} className="size-[58px] flex items-center justify-center rounded-2xl bg-white dark:bg-[#252836] text-gray-700 dark:text-gray-300 font-bold hover:bg-gray-50 dark:hover:bg-white/5 transition-all shadow-sm dark:shadow-neo-dark active:scale-95" title="Snooze">
+                        <span className="material-symbols-outlined text-[28px]">snooze</span>
                     </button>
                     {selectedTemplateId ? (
                         <div className="flex gap-2 min-w-0">
@@ -188,21 +200,32 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
                                 <span className="material-symbols-outlined text-[24px]">sms</span>
                             </button>
                             <button onClick={() => handleSendVia('whatsapp')} className="flex-1 flex items-center justify-center rounded-2xl bg-[#25D366] text-white hover:scale-105 transition-all font-bold group shadow-lg active:scale-95" title="WhatsApp">
-                                <i className="fa-brands fa-whatsapp text-2xl"></i>
-                                {/* Fallback if no FA icons */}
                                 <span className="material-symbols-outlined text-[24px]">chat</span>
                             </button>
-                            <button onClick={() => handleSendVia('telegram')} className="flex-1 flex items-center justify-center rounded-2xl bg-[#0088cc] text-white hover:scale-105 transition-all font-bold group shadow-lg active:scale-95" title="Telegram">
-                                <span className="material-symbols-outlined text-[24px]">send</span>
+                            <button onClick={() => setShowEmailOptions(true)} className="flex-1 flex items-center justify-center rounded-2xl bg-blue-500 text-white hover:scale-105 transition-all font-bold group shadow-lg active:scale-95" title="Email">
+                                <span className="material-symbols-outlined text-[24px]">mail</span>
                             </button>
                         </div>
                     ) : (
-                        <button onClick={handleMarkDone} className="flex items-center justify-center gap-2 py-4 rounded-2xl bg-green-500 text-white font-bold hover:bg-green-600 transition-all shadow-lg shadow-green-500/30 active:scale-95">
+                        <button onClick={handleMarkDone} className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-green-500 text-white font-bold hover:bg-green-600 transition-all shadow-lg shadow-green-500/30 active:scale-95">
                             <span className="material-symbols-outlined text-[22px]">check</span>
                             Mark Done
                         </button>
                     )}
                 </div>
+
+                {/* Email Options Modal */}
+                {showEmailOptions && (
+                    <div className="absolute bottom-24 left-6 right-6 p-4 bg-white dark:bg-[#2C2F40] rounded-2xl shadow-xl animate-in slide-in-from-bottom-5 fade-in z-50 border border-gray-100 dark:border-white/5">
+                        <h3 className="text-center font-bold mb-3 dark:text-white">Choose Email App</h3>
+                        <div className="space-y-2">
+                            <button onClick={() => handleSendVia('email', 'default')} className="w-full py-3 rounded-xl bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 font-bold text-sm">Default App</button>
+                            <button onClick={() => handleSendVia('email', 'gmail')} className="w-full py-3 rounded-xl bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 font-bold text-sm text-red-500">Gmail</button>
+                            <button onClick={() => handleSendVia('email', 'yahoo')} className="w-full py-3 rounded-xl bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 font-bold text-sm text-purple-500">Yahoo</button>
+                            <button onClick={() => setShowEmailOptions(false)} className="w-full py-2 text-xs text-gray-400 font-medium">Cancel</button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
