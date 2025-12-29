@@ -4,10 +4,12 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/db';
 import { sortContacts } from '../utils/sorting';
 import clsx from 'clsx';
+import { ConnectModal } from '../components/ConnectModal';
 // import { Contact } from '../types'; // Remove if not explicitly used, or use type import
 
 export const Dashboard: React.FC = () => {
     const [filter, setFilter] = useState<'All' | 'Birthdays' | 'Overdue' | 'Upcoming'>('All');
+    const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
 
     const contacts = useLiveQuery(() => db.contacts.toArray()) || [];
     const sortedContacts = sortContacts(contacts);
@@ -101,7 +103,10 @@ export const Dashboard: React.FC = () => {
                                                 </p>
                                             </div>
                                             <div className="shrink-0">
-                                                <button className="flex items-center justify-center h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 text-black text-sm font-bold shadow-[0_0_15px_rgba(70,236,19,0.2)] transition-all">
+                                                <button
+                                                    onClick={() => setSelectedContactId(contact.id)}
+                                                    className="flex items-center justify-center h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 text-black text-sm font-bold shadow-[0_0_15px_rgba(70,236,19,0.2)] transition-all"
+                                                >
                                                     Connect
                                                 </button>
                                             </div>
@@ -130,7 +135,10 @@ export const Dashboard: React.FC = () => {
                                                 </div>
                                             </div>
                                             <div className="shrink-0">
-                                                <button className="flex items-center justify-center h-9 px-4 rounded-lg bg-gray-200 dark:bg-white/10 hover:bg-gray-300 dark:hover:bg-white/20 text-gray-900 dark:text-white text-sm font-medium transition-all">
+                                                <button
+                                                    onClick={() => setSelectedContactId(contact.id)}
+                                                    className="flex items-center justify-center h-9 px-4 rounded-lg bg-gray-200 dark:bg-white/10 hover:bg-gray-300 dark:hover:bg-white/20 text-gray-900 dark:text-white text-sm font-medium transition-all"
+                                                >
                                                     Connect
                                                 </button>
                                             </div>
@@ -148,6 +156,14 @@ export const Dashboard: React.FC = () => {
                         </div>
                     )}
                 </>
+            )}
+
+            {/* Connect Modal */}
+            {selectedContactId && (
+                <ConnectModal
+                    contactId={selectedContactId}
+                    onClose={() => setSelectedContactId(null)}
+                />
             )}
         </div>
     );
