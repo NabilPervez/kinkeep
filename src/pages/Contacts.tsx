@@ -6,6 +6,7 @@ import { ConnectModal } from '../components/ConnectModal'; // Re-use this for qu
 import type { Contact } from '../types';
 import { sounds } from '../utils/sounds';
 import Papa from 'papaparse';
+import clsx from 'clsx';
 
 export const Contacts: React.FC = () => {
     const navigate = useNavigate();

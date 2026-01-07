@@ -34,7 +34,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
             if (a.category === 'birthday' && b.category !== 'birthday') return 1;
             if (a.category !== 'birthday' && b.category === 'birthday') return -1;
         }
-        return 0; // Default sort or add 'casual' priority
+        return 0;
     });
 
     const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
@@ -150,7 +150,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
                 <div className="flex items-center justify-between mb-4 mt-2">
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Select a Message</p>
                     <div className="flex gap-1 overflow-x-auto no-scrollbar pb-1 max-w-[200px] sm:max-w-none">
-                        {['all', 'casual', 'formal', 'religious', 'birthday'].map(cat => (
+                        {['all', 'islamic', 'friends', 'colleagues', 'network'].map(cat => (
                             <button
                                 key={cat}
                                 onClick={() => setTemplateFilter(cat)}
@@ -188,9 +188,11 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
                                 <span className={clsx(
                                     "text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-md",
                                     t.category === 'birthday' && "bg-pink-100 text-pink-700 dark:bg-pink-500/10 dark:text-pink-300",
-                                    t.category === 'casual' && "bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300",
-                                    t.category === 'religious' && "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300",
-                                    t.category === 'formal' && "bg-gray-100 text-gray-700 dark:bg-gray-700/30 dark:text-gray-300"
+                                    t.category === 'friends' && "bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300",
+                                    t.category === 'islamic' && "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300",
+                                    t.category === 'colleagues' && "bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-300",
+                                    t.category === 'network' && "bg-gray-100 text-gray-700 dark:bg-gray-700/30 dark:text-gray-300",
+                                    t.category === 'other' && "bg-gray-100 text-gray-600 dark:bg-gray-700/20 dark:text-gray-400"
                                 )}>
                                     {t.category}
                                 </span>
