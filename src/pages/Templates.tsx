@@ -9,18 +9,18 @@ import { useNavigate } from 'react-router-dom';
 
 export const Templates: React.FC = () => {
     const navigate = useNavigate();
-    const [filter, setFilter] = useState<'All' | 'Casual' | 'Birthday' | 'Formal' | 'Religious'>('All');
+    const [filter, setFilter] = useState<'All' | 'Islamic' | 'Friends' | 'Colleagues' | 'Network' | 'Birthday' | 'Other'>('All');
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
     // Simple state for creating new template (inline or modal? let's do inline for simplicity)
     const [isCreating, setIsCreating] = useState(false);
     const [templateToEdit, setTemplateToEdit] = useState<Template | null>(null);
-    const [newTemplate, setNewTemplate] = useState<Partial<Template>>({ category: 'casual', text: '', isDefault: false });
+    const [newTemplate, setNewTemplate] = useState<Partial<Template>>({ category: 'friends', text: '', isDefault: false });
 
     // Reset form helper
     const resetForm = () => {
         setTemplateToEdit(null);
-        setNewTemplate({ category: 'casual', text: '' });
+        setNewTemplate({ category: 'friends', text: '' });
         setIsCreating(false);
     };
 
@@ -161,7 +161,7 @@ export const Templates: React.FC = () => {
 
                 {/* Filter Chips */}
                 <div className="px-6 pb-2 overflow-x-auto no-scrollbar flex gap-2">
-                    {['All', 'Casual', 'Birthday', 'Formal', 'Religious'].map(cat => (
+                    {['All', 'Islamic', 'Friends', 'Colleagues', 'Network', 'Birthday', 'Other'].map(cat => (
                         <button
                             key={cat}
                             onClick={() => {
@@ -227,10 +227,12 @@ export const Templates: React.FC = () => {
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                     onChange={e => setNewTemplate({ ...newTemplate, category: e.target.value as any })}
                                 >
-                                    <option value="casual">Casual</option>
+                                    <option value="friends">Friends</option>
+                                    <option value="islamic">Islamic</option>
+                                    <option value="colleagues">Colleagues</option>
+                                    <option value="network">Network</option>
                                     <option value="birthday">Birthday</option>
-                                    <option value="formal">Formal</option>
-                                    <option value="religious">Religious</option>
+                                    <option value="other">Other</option>
                                 </select>
                             </div>
                             <div>
