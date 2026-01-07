@@ -215,40 +215,38 @@ export const AddContact: React.FC = () => {
                         </select>
                     </div>
 
-                    {/* Preferred Day - Only show for Weekly+ frequencies to avoid confusion */}
-                    {parseInt(formData.frequency) >= 7 && (
-                        <div className="animate-in fade-in slide-in-from-top-2">
-                            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">
-                                Preferred Day (Optional)
-                            </label>
-                            <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
-                                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => (
-                                    <button
-                                        key={day}
-                                        type="button"
-                                        onClick={() => {
-                                            sounds.play('click');
-                                            setFormData(prev => ({
-                                                ...prev,
-                                                preferredDayOfWeek: prev.preferredDayOfWeek === idx.toString() ? '' : idx.toString()
-                                            }));
-                                        }}
-                                        className={clsx(
-                                            "h-10 rounded-lg text-xs font-bold transition-all border",
-                                            formData.preferredDayOfWeek === idx.toString()
-                                                ? "bg-black dark:bg-white text-white dark:text-black border-transparent shadow-md"
-                                                : "bg-surface-light dark:bg-surface-dark border-gray-200 dark:border-white/10 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10"
-                                        )}
-                                    >
-                                        {day}
-                                    </button>
-                                ))}
-                            </div>
-                            <p className="text-[10px] text-gray-400 mt-1.5 ml-1">
-                                We'll try to schedule follow-ups on this day.
-                            </p>
+                    {/* Preferred Day - Now shown for all frequencies by user request */}
+                    <div className="animate-in fade-in slide-in-from-top-2">
+                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">
+                            Preferred Day (Optional)
+                        </label>
+                        <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+                            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => (
+                                <button
+                                    key={day}
+                                    type="button"
+                                    onClick={() => {
+                                        sounds.play('click');
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            preferredDayOfWeek: prev.preferredDayOfWeek === idx.toString() ? '' : idx.toString()
+                                        }));
+                                    }}
+                                    className={clsx(
+                                        "h-10 rounded-lg text-xs font-bold transition-all border",
+                                        formData.preferredDayOfWeek === idx.toString()
+                                            ? "bg-black dark:bg-white text-white dark:text-black border-transparent shadow-md"
+                                            : "bg-surface-light dark:bg-surface-dark border-gray-200 dark:border-white/10 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10"
+                                    )}
+                                >
+                                    {day}
+                                </button>
+                            ))}
                         </div>
-                    )}
+                        <p className="text-[10px] text-gray-400 mt-1.5 ml-1">
+                            We'll try to schedule follow-ups on this day.
+                        </p>
+                    </div>
 
                     <div className="fixed bottom-0 left-0 w-full z-40 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-t border-gray-200 dark:border-white/5 p-4 pb-safe">
                         <button className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-primary hover:bg-primary/90 text-black text-base font-bold shadow-[0_0_20px_rgba(70,236,19,0.3)] transition-all transform active:scale-[0.98]" type="submit">

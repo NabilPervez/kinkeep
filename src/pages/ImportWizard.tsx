@@ -129,10 +129,13 @@ export const ImportWizard: React.FC = () => {
 
         const contactsToMove = parsedContacts.filter(c => selectedIds.has(c.id));
 
+        console.log(`Confirming Stage: ${currentStage.label} (${currentStage.days} days). Selected: ${contactsToMove.length}`);
+
         // Add selected to final list with current frequency
         const newImportItems = contactsToMove.map(c => ({
             ...c,
-            frequencyDays: currentStage.days
+            // Ensure days is a number
+            frequencyDays: parseInt(currentStage.days.toString())
         }));
 
         setFinalImportList(prev => [...prev, ...newImportItems]);

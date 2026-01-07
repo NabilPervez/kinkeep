@@ -17,12 +17,12 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     ];
 
     return (
-        <div className="h-screen w-full flex flex-col bg-background-light dark:bg-background-dark max-w-lg mx-auto shadow-2xl relative overflow-hidden">
-            <div className="flex-1 overflow-y-auto no-scrollbar scroll-smooth relative z-0 pb-20">
+        <div className="h-[100dvh] w-full flex flex-col bg-background-light dark:bg-background-dark max-w-lg mx-auto shadow-2xl relative overflow-hidden">
+            <div className="flex-1 overflow-y-auto no-scrollbar scroll-smooth relative z-0">
                 {children}
             </div>
 
-            <nav className="absolute bottom-0 w-full z-40 bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-md border-t border-gray-200 dark:border-white/5 pb-safe">
+            <nav className="w-full z-40 bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-md border-t border-gray-200 dark:border-white/5 pb-safe">
                 <div className="flex justify-around items-center h-16">
                     {navItems.map((item) => {
                         const isActive = location.pathname === item.path;
