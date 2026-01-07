@@ -13,13 +13,17 @@ import type { Contact } from '../types';
 
 export const Dashboard: React.FC = () => {
     const [filter, setFilter] = useState<'All' | 'Birthdays' | 'Overdue' | 'Upcoming'>('All');
+    const [categoryFilter, setCategoryFilter] = useState<'All' | 'islamic' | 'friends' | 'colleagues' | 'network' | 'other'>('All');
     const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
     const [hasSeenOnboarding, setHasSeenOnboarding] = useState(() => {
         return localStorage.getItem('kinKeep_onboarding_done') === 'true';
     });
 
     const contacts = useLiveQuery(() => db.contacts.toArray()) || [];
-    const sortedContacts = sortContacts(contacts);
+
+    // Filter by category first
+    const filteredByCat = contacts.filter(c => categoryFilter === 'All' || c.category === categoryFilter);
+    const sortedContacts = sortContacts(filteredByCat);
 
     const showOnboarding = contacts.length === 0 && !hasSeenOnboarding;
 
@@ -65,7 +69,7 @@ export const Dashboard: React.FC = () => {
     };
 
     const renderContactCard = (c: Contact, isCritical: boolean, isContacted: boolean = false, isSnoozed: boolean = false) => (
-        <div key={c.id} className="p-4 rounded-2xl bg-white dark:bg-[#1E2130] border border-transparent dark:border-white/5 shadow-sm dark:shadow-neo-dark flex items-center justify-between group h-[88px]">
+        <div key={c.id} className="p-4 rounded-2xl bg-white dark:bg-[#1E2130] border border-transparent dark:border-white/5 shadow-sm dark:shadow-neo-dark flex items-center justify-between group h-[88px] animate-in fade-in zoom-in-95 duration-300">
             <div className="flex items-center gap-4">
                 <div className="relative flex items-center justify-center size-12 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-white/5 dark:to-white/10 text-xl font-bold dark:text-gray-300 overflow-hidden shrink-0">
                     {c.avatarImage ? (
@@ -143,25 +147,50 @@ export const Dashboard: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="px-6 pb-2 overflow-x-auto no-scrollbar flex gap-2">
-                    {['All', 'Birthdays', 'Overdue', 'Upcoming'].map(f => (
-                        <button
-                            key={f}
-                            onClick={() => {
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                setFilter(f as any);
-                                sounds.play('pop');
-                            }}
-                            className={clsx(
-                                "px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all whitespace-nowrap",
-                                filter === f
-                                    ? "bg-primary text-white shadow-lg shadow-primary/25"
-                                    : "bg-white dark:bg-white/5 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-100 dark:border-white/5"
-                            )}
-                        >
-                            {f}
-                        </button>
-                    ))}
+                <div className="flex flex-col gap-2 pb-2">
+                    {/* Status Filters */}
+                    <div className="px-6 overflow-x-auto no-scrollbar flex gap-2">
+                        {['All', 'Birthdays', 'Overdue', 'Upcoming'].map(f => (
+                            <button
+                                key={f}
+                                onClick={() => {
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    setFilter(f as any);
+                                    sounds.play('pop');
+                                }}
+                                className={clsx(
+                                    "px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all whitespace-nowrap",
+                                    filter === f
+                                        ? "bg-primary text-white shadow-lg shadow-primary/25"
+                                        : "bg-white dark:bg-white/5 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-100 dark:border-white/5"
+                                )}
+                            >
+                                {f}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Category Filters */}
+                    <div className="px-6 overflow-x-auto no-scrollbar flex gap-2">
+                        {['All', 'islamic', 'friends', 'colleagues', 'network'].map(c => (
+                            <button
+                                key={c}
+                                onClick={() => {
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    setCategoryFilter(c as any);
+                                    sounds.play('pop');
+                                }}
+                                className={clsx(
+                                    "px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wide transition-all whitespace-nowrap border",
+                                    categoryFilter === c
+                                        ? "bg-gray-900 dark:bg-white text-white dark:text-black border-transparent"
+                                        : "bg-transparent text-gray-400 border-gray-200 dark:border-white/10 hover:border-gray-400"
+                                )}
+                            >
+                                {c}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </header>
 

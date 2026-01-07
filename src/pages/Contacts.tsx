@@ -94,26 +94,79 @@ export const Contacts: React.FC = () => {
         link.click();
     };
 
+    const [showExportMenu, setShowExportMenu] = useState(false);
+
+    // Helpers for display
+    const getFrequencyLabel = (days: number) => {
+        if (days === 1) return { label: 'Daily', color: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300' };
+        if (days === 3) return { label: 'Every 3d', color: 'bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300' };
+        if (days === 7) return { label: 'Weekly', color: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300' };
+        if (days === 14) return { label: 'Bi-Weekly', color: 'bg-lime-100 text-lime-700 dark:bg-lime-500/20 dark:text-lime-300' };
+        if (days === 30) return { label: 'Monthly', color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300' };
+        if (days === 90) return { label: 'Quarterly', color: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-500/20 dark:text-cyan-300' };
+        return { label: 'Yearly', color: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300' };
+    };
+
+    const getDayLabel = (day?: number) => {
+        if (day === undefined) return null;
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        return { label: days[day], color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300' };
+    };
+
+    const getCategoryStyle = (cat?: string) => {
+        switch (cat) {
+            case 'islamic': return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300';
+            case 'friends': return 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300';
+            case 'colleagues': return 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300';
+            case 'network': return 'bg-gray-100 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300';
+            default: return 'bg-gray-100 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300';
+        }
+    };
+
+    const handleExport = (type: 'csv' | 'vcf') => {
+        if (type === 'csv') handleExportCSV();
+        else handleExportVCF();
+        setShowExportMenu(false);
+    };
+
     return (
         <div className="flex-1 flex flex-col h-screen bg-background-light dark:bg-background-dark">
             <header className="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-gray-200 dark:border-white/5 pb-2">
                 <div className="flex items-center justify-between px-4 pt-4 pb-2">
                     <h1 className="text-2xl font-black leading-tight tracking-tight">Contacts</h1>
-                    <div className="flex gap-2">
-                        {/* Export Menu (Simple Dropdown or separate buttons) - Using simple buttons for now or a group */}
-                        <div className="flex items-center gap-1 bg-surface-light dark:bg-surface-dark rounded-full p-1 border border-gray-200 dark:border-white/10 hidden sm:flex">
-                            <button onClick={handleExportCSV} className="px-3 py-1 text-xs font-bold text-gray-500 hover:text-primary transition-colors">CSV</button>
-                            <div className="w-px h-3 bg-gray-300 dark:bg-white/20"></div>
-                            <button onClick={handleExportVCF} className="px-3 py-1 text-xs font-bold text-gray-500 hover:text-primary transition-colors">VCF</button>
-                        </div>
-
-                        {/* Mobile Export (Icon) */}
-                        <div className="flex sm:hidden relative group">
-                            <button className="flex items-center justify-center size-10 rounded-full bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white transition-all">
+                    <div className="flex gap-2 relative">
+                        {/* Export Button with Dropdown */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowExportMenu(!showExportMenu)}
+                                className="flex items-center justify-center size-10 rounded-full bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10 text-gray-900 dark:text-white transition-all active:scale-95 shadow-sm"
+                            >
                                 <span className="material-symbols-outlined font-bold">download</span>
                             </button>
-                            {/* Hover/Click menu for mobile would be better but keeping simple: Tap downloads CSV by default? Or show modal. Let's make it download VCF as default/better for phone. Actualy let's just do actions sheet if we could. For now, simple alerts or dual buttons might clutter. Let's skip complex UI. Using standard buttons elsewhere. */}
+
+                            {showExportMenu && (
+                                <div className="absolute top-full right-0 mt-2 w-32 bg-white dark:bg-[#1E2130] rounded-xl shadow-xl border border-gray-200 dark:border-white/10 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
+                                    <button
+                                        onClick={() => handleExport('csv')}
+                                        className="w-full px-4 py-3 text-left text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5 flex items-center gap-2"
+                                    >
+                                        <span className="material-symbols-outlined text-[18px]">csv</span> CSV
+                                    </button>
+                                    <div className="h-px bg-gray-100 dark:bg-white/5"></div>
+                                    <button
+                                        onClick={() => handleExport('vcf')}
+                                        className="w-full px-4 py-3 text-left text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5 flex items-center gap-2"
+                                    >
+                                        <span className="material-symbols-outlined text-[18px]">contact_page</span> VCF
+                                    </button>
+                                </div>
+                            )}
                         </div>
+
+                        {/* Back overlay to close menu */}
+                        {showExportMenu && (
+                            <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setShowExportMenu(false)}></div>
+                        )}
 
                         <Link to="/import" className="flex items-center justify-center size-10 rounded-full bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10 text-gray-900 dark:text-white transition-all active:scale-95 shadow-sm">
                             <span className="material-symbols-outlined font-bold">upload_file</span>
@@ -152,14 +205,6 @@ export const Contacts: React.FC = () => {
                         >
                             {frequencyOptions.map(o => <option key={o.val} value={o.val}>{o.label}</option>)}
                         </select>
-
-                        {/* Mobile Export Buttons shown in filter row for accessibility */}
-                        <button onClick={handleExportCSV} className="sm:hidden px-3 py-1.5 rounded-lg bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-white/10 text-xs font-bold text-gray-600 dark:text-gray-300 whitespace-nowrap flex items-center gap-1">
-                            <span className="material-symbols-outlined text-[14px]">csv</span> CSV
-                        </button>
-                        <button onClick={handleExportVCF} className="sm:hidden px-3 py-1.5 rounded-lg bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-white/10 text-xs font-bold text-gray-600 dark:text-gray-300 whitespace-nowrap flex items-center gap-1">
-                            <span className="material-symbols-outlined text-[14px]">contact_page</span> VCF
-                        </button>
                     </div>
                 </div>
             </header>
@@ -178,50 +223,66 @@ export const Contacts: React.FC = () => {
                                     {letter}
                                 </h3>
                                 <div className="space-y-2">
-                                    {groupedContacts[letter].map(contact => (
-                                        <div key={contact.id} className="group flex items-center justify-between p-3 rounded-2xl bg-surface-light dark:bg-surface-dark active:scale-[0.99] transition-all hover:shadow-sm border border-transparent hover:border-gray-100 dark:hover:border-white/5">
-                                            <div className="flex items-center gap-3 flex-1 min-w-0" onClick={() => setSelectedContactId(contact.id)}>
-                                                <div className={clsx(
-                                                    "flex items-center justify-center rounded-full size-12 font-bold text-lg shrink-0 text-white",
-                                                    contact.category === 'islamic' ? "bg-emerald-500" :
-                                                        contact.category === 'friends' ? "bg-blue-500" :
-                                                            contact.category === 'colleagues' ? "bg-purple-500" :
-                                                                "bg-gray-400"
-                                                )}>
-                                                    {contact.firstName[0]}
-                                                </div>
-                                                <div className="flex flex-col min-w-0">
-                                                    <h4 className="font-bold text-base truncate pr-2">{contact.firstName} {contact.lastName}</h4>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-[10px] uppercase font-bold text-gray-400 bg-gray-100 dark:bg-white/5 px-1.5 py-0.5 rounded">{contact.category || 'Other'}</span>
-                                                        {contact.frequencyDays && <span className="text-[10px] text-gray-400">Every {contact.frequencyDays}d</span>}
+                                    {groupedContacts[letter].map(contact => {
+                                        const freq = getFrequencyLabel(contact.frequencyDays);
+                                        const dayInfo = getDayLabel(contact.preferredDayOfWeek);
+                                        return (
+                                            <div key={contact.id} className="group flex items-center justify-between p-3 rounded-2xl bg-surface-light dark:bg-surface-dark active:scale-[0.99] transition-all hover:shadow-sm border border-transparent hover:border-gray-100 dark:hover:border-white/5">
+                                                <div className="flex items-center gap-3 flex-1 min-w-0" onClick={() => setSelectedContactId(contact.id)}>
+                                                    <div className={clsx(
+                                                        "flex items-center justify-center rounded-full size-12 font-bold text-lg shrink-0 text-white",
+                                                        contact.category === 'islamic' ? "bg-emerald-500" :
+                                                            contact.category === 'friends' ? "bg-blue-500" :
+                                                                contact.category === 'colleagues' ? "bg-purple-500" :
+                                                                    "bg-gray-400"
+                                                    )}>
+                                                        {contact.firstName[0]}
+                                                    </div>
+                                                    <div className="flex flex-col min-w-0 gap-1.5">
+                                                        <h4 className="font-bold text-base truncate leading-none pt-0.5">{contact.firstName} {contact.lastName}</h4>
+                                                        <div className="flex flex-wrap items-center gap-1.5">
+                                                            {/* Category Label */}
+                                                            <span className={clsx("text-[10px] uppercase font-bold px-1.5 py-0.5 rounded", getCategoryStyle(contact.category))}>
+                                                                {contact.category || 'Other'}
+                                                            </span>
+                                                            {/* Frequency Label */}
+                                                            <span className={clsx("text-[10px] font-bold px-1.5 py-0.5 rounded", freq.color)}>
+                                                                {freq.label}
+                                                            </span>
+                                                            {/* Day Label */}
+                                                            {dayInfo && (
+                                                                <span className={clsx("text-[10px] font-bold px-1.5 py-0.5 rounded", dayInfo.color)}>
+                                                                    {dayInfo.label}
+                                                                </span>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
+                                                <div className="flex items-center gap-1">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            sounds.play('click');
+                                                            navigate(`/add-contact/${contact.id}`);
+                                                        }}
+                                                        className="size-8 flex items-center justify-center rounded-full text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+                                                    >
+                                                        <span className="material-symbols-outlined text-[18px]">edit</span>
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            sounds.play('pop');
+                                                            setSelectedContactId(contact.id);
+                                                        }}
+                                                        className="size-8 flex items-center justify-center rounded-full text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+                                                    >
+                                                        <span className="material-symbols-outlined text-[18px]">send</span>
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <div className="flex items-center gap-1">
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        sounds.play('click');
-                                                        navigate(`/add-contact/${contact.id}`);
-                                                    }}
-                                                    className="size-8 flex items-center justify-center rounded-full text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
-                                                >
-                                                    <span className="material-symbols-outlined text-[18px]">edit</span>
-                                                </button>
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        sounds.play('pop');
-                                                        setSelectedContactId(contact.id);
-                                                    }}
-                                                    className="size-8 flex items-center justify-center rounded-full text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
-                                                >
-                                                    <span className="material-symbols-outlined text-[18px]">send</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
                         ))}
