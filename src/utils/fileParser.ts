@@ -25,13 +25,27 @@ export const parseCSV = (file: File): Promise<ParseResult> => {
                     const lastName = row['Last Name'] || row['Family Name'] || row['Last'] || '';
                     const phone = row['Phone 1 - Value'] || row['Phone'] || row['Mobile'] || row['Cell'] || '';
 
+                    // Parser for Frequency
+                    const freqRaw = row['Frequency'] || row['Cadence'] || row['Schedule'] || row['Frequency Days'] || '';
+                    let freq = 30; // Default
+                    if (freqRaw) {
+                        const lower = freqRaw.toString().toLowerCase();
+                        if (lower.includes('daily') || lower === '1') freq = 1;
+                        else if (lower.includes('3 day') || lower === '3') freq = 3;
+                        else if (lower.includes('weekly') || lower.includes('week') || lower === '7') freq = 7;
+                        else if (lower.includes('bi') || lower === '14') freq = 14;
+                        else if (lower.includes('month') || lower === '30') freq = 30;
+                        else if (lower.includes('quarter') || lower === '90') freq = 90;
+                        else if (lower.includes('year') || lower === '365') freq = 365;
+                    }
+
                     if (firstName || lastName) { // Allow one name at least
                         contacts.push({
                             id: uuidv4(),
                             firstName: firstName || 'Unknown',
                             lastName: lastName || '',
                             phoneNumber: phone || '',
-                            frequencyDays: 30, // Default to monthly
+                            frequencyDays: freq,
                             snoozedUntil: undefined,
                             lastContacted: 0,
                             isArchived: false,

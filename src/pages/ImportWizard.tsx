@@ -66,6 +66,22 @@ export const ImportWizard: React.FC = () => {
 
     const currentStage = STAGES[currentStageIndex];
 
+    // Auto-select contacts matching current stage frequency
+    React.useEffect(() => {
+        if (step === 2) {
+            const available = parsedContacts.filter(c => !processedIds.has(c.id));
+            const matches = available.filter(c => c.frequencyDays === currentStage.days);
+            if (matches.length > 0) {
+                setSelectedIds(prev => {
+                    const next = new Set(prev);
+                    matches.forEach(m => next.add(m.id));
+                    return next;
+                });
+            }
+        }
+    }, [currentStageIndex, step, parsedContacts, processedIds, currentStage.days]);
+
+
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const f = e.target.files[0];
