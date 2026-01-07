@@ -12,126 +12,72 @@ export class KinKeepDB extends Dexie {
             templates: 'id, category, isDefault'
         });
 
-        // Seed default templates
-        this.on('populate', () => {
-            this.templates.bulkAdd([
-                {
-                    "id": "02912c2e-472f-4033-a56c-1d910c4409bf",
-                    "category": "formal",
-                    "text": "Hey {NAME}, was just thinking about you and wondering how work is going. What projects are keeping you busy lately?",
-                    "isDefault": true
-                },
-                {
-                    "id": "0b8fbe45-eedc-4815-97c5-ed1c4dfebe45",
-                    "category": "birthday",
-                    "text": "Happy Birthday, {NAME}! Hope you have a great one—doing anything fun to celebrate?",
-                    "isDefault": true
-                },
-                {
-                    "id": "0bc2ca86-4d1b-4eff-b091-8bc6a8df1038",
-                    "category": "religious",
-                    "text": "Salaam {NAME}, was just thinking about you and keeping you in my duas. How is the family doing?",
-                    "isDefault": true
-                },
-                {
-                    "id": "1b1f56c5-7199-4a94-8e36-60d97ba5ecd7",
-                    "category": "religious",
-                    "text": "Salaam and Jummah Mubarak! Thinking of you—hope you have a blessed Friday. Any big plans for the weekend?",
-                    "isDefault": true
-                },
-                {
-                    "id": "1b2d2c2b-af1f-44ad-b46f-0d8a75f96969",
-                    "category": "religious",
-                    "text": "As-salaamu alaykum, just checking in. May Allah bless your day. How are things going with you?",
-                    "isDefault": true
-                },
-                {
-                    "id": "3daa2134-9bbe-4105-9e4b-12e26798747c",
-                    "category": "casual",
-                    "text": "Hey {NAME}, was just thinking about you! We definitely need to catch up—are you free for coffee soon?",
-                    "isDefault": true
-                },
-                {
-                    "id": "4d40f17c-20a8-40b2-993d-7d1b5723873a",
-                    "category": "formal",
-                    "text": "Hi {NAME}, thinking of you and sending my best. What have you been working on lately?",
-                    "isDefault": true
-                },
-                {
-                    "id": "60ad8cb6-8b92-4fa6-b106-e3de61394f59",
-                    "category": "casual",
-                    "text": "Salaam {NAME}! Was just thinking about you—it's been way too long. How is everything going in your world?",
-                    "isDefault": true
-                },
-                {
-                    "id": "65e6b748-9062-4959-92d7-1ddbc891e4bb",
-                    "category": "religious",
-                    "text": "Salaam {NAME}, making dua for you and the family today. Everyone doing okay over there?",
-                    "isDefault": true
-                },
-                {
-                    "id": "824c6c45-28c9-4839-a6c7-bbba822eeeac",
-                    "category": "religious",
-                    "text": "Salaam! Was just thinking about you—hope you're having a peaceful week. What have you been up to?",
-                    "isDefault": true
-                },
-                {
-                    "id": "94436eb8-b20e-440d-b6b3-7f95917e7a82",
-                    "category": "casual",
-                    "text": "Yo {NAME}, what's good? Was just thinking about you. Let's link up soon—when are you free?",
-                    "isDefault": true
-                },
-                {
-                    "id": "ac904119-dfe6-43d1-9de8-3ebae588a3f0",
-                    "category": "birthday",
-                    "text": "Happy Birthday! Wishing you a year full of baraka. Did you get any cool gifts?",
-                    "isDefault": true
-                },
-                {
-                    "id": "ae9b0b68-10c0-4be9-bacf-baec8d00c15f",
-                    "category": "formal",
-                    "text": "Hello {NAME}, was just thinking about you. Hope you're doing well. How have you been lately?",
-                    "isDefault": true
-                },
-                {
-                    "id": "c8c8897d-0f26-435e-9aa0-96944678c745",
-                    "category": "birthday",
-                    "text": "Happy Birthday {NAME}! Hope you have an amazing day! Are you doing anything special tonight?",
-                    "isDefault": true
-                },
-                {
-                    "id": "d7adbeb7-eb6e-474c-bc26-92b967f1f19b",
-                    "category": "casual",
-                    "text": "Hi {NAME}, was just thinking about you! Read or watched anything good recently?",
-                    "isDefault": true
-                },
-                {
-                    "id": "f051f131-ee13-4b73-af07-bf19a16dd594",
-                    "category": "birthday",
-                    "text": "Happy B-day {NAME}! Let's celebrate soon. When are you free to grab a bite?",
-                    "isDefault": true
-                },
-                {
-                    "id": "f05ce151-62da-41a5-ad39-f741f6df8651",
-                    "category": "religious",
-                    "text": "Salaam {NAME}, Jummah Mubarak! Thinking of you and the family. How is everyone doing?",
-                    "isDefault": true
-                },
-                {
-                    "id": "f2a219cb-6d66-4ed2-b986-50561494743f",
-                    "category": "casual",
-                    "text": "Thinking of you, {NAME}! Hope the week is treating you well. What's new with you?",
-                    "isDefault": true
-                },
-                {
-                    "id": "fa57a99b-09e8-4ebd-b1ba-4ffdb3fc0c2d",
-                    "category": "formal",
-                    "text": "Hey {NAME}, thinking of you! Hope projects are going smoothly. What are you working on these days?",
-                    "isDefault": true
-                }
-            ]);
+        this.version(2).stores({
+            contacts: 'id, firstName, lastName, frequencyDays, lastContacted, birthday, snoozedUntil, isArchived, category, *tags',
+            templates: 'id, category, isDefault'
+        }).upgrade(trans => {
+            // Migration: Set default category 'other' for everything
+            return trans.table("contacts").toCollection().modify(contact => {
+                if (!contact.category) contact.category = 'other';
+            });
         });
+
+        // Seed default templates - CLEAR old ones first if needed, but 'populate' only runs on creation.
+        // Since we are upgrading, 'populate' won't run again for existing users.
+        // We need to run a migration or just force add.
+        // For this task, assuming dev/new env or OK to just add.
+        // BUT user said "remove all the templates" and "add in one template each".
+        // I will use a hook to clean and seed on version upgrade?
+        // Easier: Just check on open if templates exist and match new schema?
+        // Reliable way: On 'ready', check if templates are the old ones.
+
+        // Actually, for simplicity in this environment:
+        this.on('populate', () => {
+            this.seedTemplates();
+        });
+    }
+
+    async seedTemplates() {
+        await this.templates.clear();
+        await this.templates.bulkAdd([
+            {
+                "id": "1",
+                "category": "islamic",
+                "text": "As-salaamu alaykum {NAME}! Just checking in and making dua for you. Hope you and the family are well.",
+                "isDefault": true
+            },
+            {
+                "id": "2",
+                "category": "friends",
+                "text": "Hey {NAME}! It's been a minute. Just wanted to say hi and see how you're doing?",
+                "isDefault": true
+            },
+            {
+                "id": "3",
+                "category": "colleagues",
+                "text": "Hi {NAME}, hope you're having a productive week. Let's catch up soon.",
+                "isDefault": true
+            },
+            {
+                "id": "4",
+                "category": "birthday",
+                "text": "Happy Birthday {NAME}! Wishing you a fantastic year head full of baraka!",
+                "isDefault": true
+            }
+        ]);
     }
 }
 
 export const db = new KinKeepDB();
+
+// Force re-seed on load for this update (Quick fix for the task to ensure old templates are gone)
+// In a real app we'd be more careful.
+db.on('ready', async () => {
+    const templates = await db.templates.toArray();
+    // If we have old categories like 'casual', nuke them.
+    const hasOld = templates.some(t => ['casual', 'formal', 'religious'].includes(t.category as any));
+    if (hasOld || templates.length === 0) {
+        await db.templates.clear();
+        await db.seedTemplates();
+    }
+});

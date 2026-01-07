@@ -22,7 +22,8 @@ export const AddContact: React.FC = () => {
         phone: '',
         frequency: '14', // Default to 2 weeks
         birthday: '',
-        preferredDayOfWeek: '' as string // "0"-"6" or ""
+        preferredDayOfWeek: '' as string, // "0"-"6" or ""
+        category: 'friends' // default
     });
 
     // Populate form when data loads
@@ -35,7 +36,8 @@ export const AddContact: React.FC = () => {
                 phone: existingContact.phoneNumber || '',
                 frequency: existingContact.frequencyDays.toString(),
                 birthday: existingContact.birthday || '',
-                preferredDayOfWeek: existingContact.preferredDayOfWeek !== undefined ? existingContact.preferredDayOfWeek.toString() : ''
+                preferredDayOfWeek: existingContact.preferredDayOfWeek !== undefined ? existingContact.preferredDayOfWeek.toString() : '',
+                category: existingContact.category || 'friends'
             });
         }
     }, [existingContact]);
@@ -51,6 +53,7 @@ export const AddContact: React.FC = () => {
             frequencyDays: parseInt(formData.frequency),
             birthday: formData.birthday || undefined,
             preferredDayOfWeek: formData.preferredDayOfWeek ? parseInt(formData.preferredDayOfWeek) : undefined,
+            category: formData.category as any,
             // Preserve existing logic fields if editing
             lastContacted: existingContact ? existingContact.lastContacted : Date.now(),
             isArchived: existingContact ? existingContact.isArchived : false,
@@ -147,6 +150,28 @@ export const AddContact: React.FC = () => {
                                 placeholder="(555) 123-4567"
                                 type="tel"
                             />
+                        </div>
+                    </div>
+
+                    {/* Category Selector */}
+                    <div className="space-y-3">
+                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300" htmlFor="category">Category</label>
+                        <div className="grid grid-cols-3 gap-2">
+                            {['islamic', 'friends', 'colleagues', 'network'].map(cat => (
+                                <button
+                                    key={cat}
+                                    type="button"
+                                    onClick={() => setFormData(prev => ({ ...prev, category: cat }))}
+                                    className={clsx(
+                                        "py-2.5 rounded-xl text-sm font-bold capitalize transition-all border",
+                                        formData.category === cat
+                                            ? "bg-black dark:bg-white text-white dark:text-black border-transparent shadow"
+                                            : "bg-surface-light dark:bg-surface-dark border-gray-200 dark:border-white/10 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10"
+                                    )}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
                         </div>
                     </div>
 

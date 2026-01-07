@@ -16,6 +16,7 @@ export interface Contact {
     snoozedUntil?: number;    // Unix Timestamp (ignore in sort until this passes)
     isArchived: boolean;
 
+    category?: 'islamic' | 'friends' | 'colleagues' | 'network' | 'other';
     tags: string[];           // ["Family", "Work"]
     preferredDayOfWeek?: number; // 0 = Sunday, 1 = Monday, etc.
     notes?: string;
@@ -27,7 +28,7 @@ export interface Contact {
 
 export interface Template {
     id: string;
-    category: 'casual' | 'formal' | 'birthday' | 'religious';
+    category: 'islamic' | 'friends' | 'colleagues' | 'network' | 'other' | 'birthday';
     text: string;             // "Happy Birthday {NAME}!"
     isDefault: boolean;
 }
