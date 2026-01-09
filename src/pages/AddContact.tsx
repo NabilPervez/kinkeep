@@ -83,10 +83,11 @@ export const AddContact: React.FC = () => {
 
     return (
         <div className="flex-1 flex flex-col gap-6 p-4 pb-24">
-            <header className="flex items-center justify-between p-4 sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-gray-200 dark:border-white/5">
+
+            <header className="flex items-center justify-between p-4 sticky top-0 z-50 glass-panel border-b-0">
                 <button
                     onClick={() => navigate(-1)}
-                    className="size-10 flex items-center justify-center rounded-full text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+                    className="size-10 flex items-center justify-center rounded-full text-gray-900 dark:text-white hover:bg-white/10 transition-colors"
                 >
                     <span className="material-symbols-outlined">arrow_back</span>
                 </button>
@@ -105,7 +106,7 @@ export const AddContact: React.FC = () => {
                                 name="firstName"
                                 value={formData.firstName}
                                 onChange={handleChange}
-                                className="block w-full rounded-xl border-gray-200 dark:border-white/10 bg-surface-light dark:bg-surface-dark text-gray-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-base py-3 px-4 placeholder-gray-400"
+                                className="block w-full rounded-xl border-gray-200 dark:border-white/10 glass-input text-gray-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-base py-3 px-4 placeholder-gray-400"
                                 placeholder="Jane"
                                 required
                                 type="text"
@@ -117,7 +118,7 @@ export const AddContact: React.FC = () => {
                                 name="lastName"
                                 value={formData.lastName}
                                 onChange={handleChange}
-                                className="block w-full rounded-xl border-gray-200 dark:border-white/10 bg-surface-light dark:bg-surface-dark text-gray-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-base py-3 px-4 placeholder-gray-400"
+                                className="block w-full rounded-xl border-gray-200 dark:border-white/10 glass-input text-gray-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-base py-3 px-4 placeholder-gray-400"
                                 placeholder="Doe"
                                 type="text"
                             />
@@ -134,7 +135,7 @@ export const AddContact: React.FC = () => {
                                 name="phone"
                                 value={formData.phone}
                                 onChange={handleChange}
-                                className="block w-full rounded-xl border-gray-200 dark:border-white/10 bg-surface-light dark:bg-surface-dark text-gray-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-base py-3 pl-11 px-4 placeholder-gray-400"
+                                className="block w-full rounded-xl border-gray-200 dark:border-white/10 glass-input text-gray-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-base py-3 pl-11 px-4 placeholder-gray-400"
                                 placeholder="(555) 123-4567"
                                 type="tel"
                             />
@@ -154,7 +155,7 @@ export const AddContact: React.FC = () => {
                                         "py-2.5 rounded-xl text-sm font-bold capitalize transition-all border",
                                         formData.category === cat.id
                                             ? "bg-black dark:bg-white text-white dark:text-black border-transparent shadow"
-                                            : "bg-surface-light dark:bg-surface-dark border-gray-200 dark:border-white/10 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10"
+                                            : "glass-input border-gray-200 dark:border-white/10 text-gray-500 hover:bg-white/10"
                                     )}
                                 >
                                     {cat.label}
@@ -176,7 +177,7 @@ export const AddContact: React.FC = () => {
                                 name="birthday"
                                 value={formData.birthday}
                                 onChange={handleChange}
-                                className="block w-full rounded-xl border-gray-200 dark:border-white/10 bg-surface-light dark:bg-surface-dark text-gray-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-base py-3 pl-11 px-4 [color-scheme:light] dark:[color-scheme:dark]"
+                                className="block w-full rounded-xl border-gray-200 dark:border-white/10 glass-input text-gray-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-base py-3 pl-11 px-4 [color-scheme:light] dark:[color-scheme:dark]"
                                 type="date"
                             />
                         </div>
@@ -190,10 +191,10 @@ export const AddContact: React.FC = () => {
                             name="frequency"
                             value={formData.frequency}
                             onChange={handleChange}
-                            className="w-full h-12 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 font-medium appearance-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                            className="w-full h-12 rounded-xl border border-gray-200 dark:border-white/10 glass-input px-4 font-medium appearance-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
                         >
                             {FREQUENCIES.map(f => (
-                                <option key={f.value} value={f.value}>{f.label}</option>
+                                <option key={f.value} value={f.value} className="text-black dark:text-white bg-white dark:bg-gray-800">{f.label}</option>
                             ))}
                         </select>
                     </div>
@@ -219,7 +220,7 @@ export const AddContact: React.FC = () => {
                                         "h-10 rounded-lg text-xs font-bold transition-all border",
                                         formData.preferredDayOfWeek === day.value.toString()
                                             ? "bg-black dark:bg-white text-white dark:text-black border-transparent shadow-md"
-                                            : "bg-surface-light dark:bg-surface-dark border-gray-200 dark:border-white/10 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10"
+                                            : "glass-input border-gray-200 dark:border-white/10 text-gray-500 hover:bg-white/10"
                                     )}
                                 >
                                     {day.label}
@@ -231,7 +232,7 @@ export const AddContact: React.FC = () => {
                         </p>
                     </div>
 
-                    <div className="fixed bottom-0 right-0 left-0 md:left-64 z-40 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-t border-gray-200 dark:border-white/5 p-4 pb-safe flex flex-col gap-3">
+                    <div className="fixed bottom-0 right-0 left-0 md:left-64 z-40 glass-panel border-t-0 p-4 pb-safe flex flex-col gap-3">
                         <button className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-primary hover:bg-primary/90 text-black text-base font-bold shadow-[0_0_20px_rgba(242,87,87,0.3)] transition-all transform active:scale-[0.98]" type="submit">
                             <span className="material-symbols-outlined font-bold">check</span>
                             Save Contact

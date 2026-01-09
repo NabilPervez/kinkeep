@@ -17,12 +17,19 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     ];
 
     return (
-        <div className="h-[100dvh] w-full flex flex-col md:flex-row bg-background-light dark:bg-background-dark max-w-lg md:max-w-none mx-auto shadow-2xl relative overflow-hidden">
+        <div className="h-[100dvh] w-full flex flex-col md:flex-row max-w-lg md:max-w-none mx-auto shadow-2xl relative overflow-hidden bg-gray-50 dark:bg-[#0f1115]">
+
+            {/* Aurora Background Layer */}
+            <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
+                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-400/30 dark:bg-purple-900/40 rounded-full blur-[80px] animate-blob" />
+                <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-400/30 dark:bg-blue-900/40 rounded-full blur-[80px] animate-blob animation-delay-2000" />
+                <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[50%] bg-emerald-400/30 dark:bg-emerald-900/40 rounded-full blur-[80px] animate-blob animation-delay-4000" />
+            </div>
 
             {/* Desktop Navigation Rail */}
-            <nav className="hidden md:flex w-64 shrink-0 z-50 bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-md border-r border-gray-200 dark:border-white/5 flex-col py-6 px-4 gap-2">
+            <nav className="hidden md:flex w-64 shrink-0 z-50 glass-panel border-r border-white/20 flex-col py-6 px-4 gap-2">
                 <div className="flex items-center gap-3 mb-8 px-4">
-                    <div className="flex items-center justify-center size-8 rounded-lg bg-primary text-white font-bold shadow-lg shadow-primary/25">
+                    <div className="flex items-center justify-center size-8 rounded-lg bg-primary/90 text-white font-bold shadow-lg shadow-primary/25 backdrop-blur-sm">
                         <span className="material-symbols-outlined text-[20px]">favorite</span>
                     </div>
                     <span className="text-xl font-black tracking-tight text-gray-900 dark:text-white">KinKeep</span>
@@ -37,8 +44,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                             className={clsx(
                                 "flex items-center gap-4 px-4 py-3 rounded-xl transition-all active:scale-95 group",
                                 isActive
-                                    ? "bg-primary text-white shadow-lg shadow-primary/25"
-                                    : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white"
+                                    ? "bg-primary/90 text-white shadow-lg shadow-primary/25 backdrop-blur-sm"
+                                    : "text-gray-600 dark:text-gray-300 hover:bg-white/10 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white"
                             )}
                         >
                             <span className={clsx("material-symbols-outlined transition-all", isActive ? "font-bold" : "")}>
@@ -50,12 +57,12 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 })}
             </nav>
 
-            <div className="flex-1 overflow-y-auto no-scrollbar scroll-smooth relative z-0">
+            <div className="flex-1 overflow-y-auto no-scrollbar scroll-smooth relative z-10 p-4">
                 {children}
             </div>
 
             {/* Mobile Navigation Bar */}
-            <nav className="md:hidden w-full shrink-0 z-50 bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-md border-t border-gray-200 dark:border-white/5 pb-safe">
+            <nav className="md:hidden w-full shrink-0 z-50 glass-panel border-t border-white/20 pb-safe">
                 <div className="flex justify-around items-center h-16">
                     {navItems.map((item) => {
                         const isActive = location.pathname === item.path;
@@ -66,7 +73,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                                 onClick={() => isActive ? null : sounds.play('click')}
                                 className={clsx(
                                     "flex flex-col items-center justify-center w-full h-full space-y-1 transition-all active:scale-95",
-                                    isActive ? "text-primary" : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                                    isActive ? "text-primary dark:text-primary-light drop-shadow-sm" : "text-gray-500 dark:text-gray-400"
                                 )}
                             >
                                 <span className={clsx("material-symbols-outlined transition-all", isActive ? "font-bold text-[28px]" : "text-[24px]")}>

@@ -119,7 +119,8 @@ export const Templates: React.FC = () => {
     const filterOptions = [{ id: 'all', label: 'All' }, ...TEMPLATE_CATEGORIES];
 
     return (
-        <div className="flex-1 flex flex-col h-screen bg-background-light dark:bg-background-dark">
+
+        <div className="flex-1 flex flex-col h-screen bg-transparent">
             <input
                 type="file"
                 ref={fileInputRef}
@@ -127,23 +128,23 @@ export const Templates: React.FC = () => {
                 className="hidden"
                 accept=".json"
             />
-            <header className="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-gray-200 dark:border-white/5 pb-2">
+            <header className="sticky top-0 z-50 glass-panel border-b-0 pb-2">
                 <div className="flex items-center justify-between px-6 pt-12 pb-2">
-                    <button onClick={() => navigate(-1)} className="flex items-center justify-center size-10 -ml-2 rounded-full text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
+                    <button onClick={() => navigate(-1)} className="flex items-center justify-center size-10 -ml-2 rounded-full text-gray-900 dark:text-white hover:bg-white/10 transition-colors">
                         <span className="material-symbols-outlined">arrow_back</span>
                     </button>
                     <h1 className="text-xl font-bold leading-tight tracking-tight dark:text-white">Templates</h1>
                     <div className="flex gap-2 -mr-2">
                         <button
                             onClick={handleExport}
-                            className="flex items-center justify-center size-10 rounded-full bg-surface-light dark:bg-white/5 text-gray-900 dark:text-gray-300 transition-all hover:bg-gray-200 dark:hover:bg-white/10"
+                            className="flex items-center justify-center size-10 rounded-full glass-input hover:bg-white/20 text-gray-900 dark:text-gray-300 transition-all"
                             title="Export Templates"
                         >
                             <span className="material-symbols-outlined text-[20px]">download</span>
                         </button>
                         <button
                             onClick={handleImportClick}
-                            className="flex items-center justify-center size-10 rounded-full bg-surface-light dark:bg-white/5 text-gray-900 dark:text-gray-300 transition-all hover:bg-gray-200 dark:hover:bg-white/10"
+                            className="flex items-center justify-center size-10 rounded-full glass-input hover:bg-white/20 text-gray-900 dark:text-gray-300 transition-all"
                             title="Import Templates"
                         >
                             <span className="material-symbols-outlined text-[20px]">upload</span>
@@ -173,7 +174,7 @@ export const Templates: React.FC = () => {
                                 "px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all whitespace-nowrap",
                                 filter === cat.id
                                     ? "bg-primary text-white shadow-lg shadow-primary/25"
-                                    : "bg-white dark:bg-white/5 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-100 dark:border-white/5"
+                                    : "glass-input text-gray-500 hover:bg-white/20 border-transparent dark:text-gray-300"
                             )}
                         >
                             {cat.label}
@@ -184,12 +185,12 @@ export const Templates: React.FC = () => {
 
             <main className="flex-1 overflow-y-auto no-scrollbar pb-32 px-6 pt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-min">
                 {filteredTemplates.map(template => (
-                    <div key={template.id} className="group relative p-5 rounded-3xl bg-white dark:bg-[#1E2130] border border-transparent dark:border-white/5 shadow-sm dark:shadow-neo-dark hover:scale-[1.01] transition-all duration-300 break-inside-avoid">
+                    <div key={template.id} className="group relative p-5 rounded-3xl glass-card hover:scale-[1.01] transition-all duration-300 break-inside-avoid">
                         <p className="text-base font-medium leading-relaxed text-gray-800 dark:text-gray-200 pr-0 mb-3">
                             "{template.text}"
                         </p>
                         <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 bg-gray-50 dark:bg-white/5 px-2 py-1 rounded-md">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 bg-gray-100/50 dark:bg-white/10 px-2 py-1 rounded-md backdrop-blur-sm">
                                 {TEMPLATE_CATEGORIES.find(c => c.id === template.category)?.label || template.category}
                             </span>
                             <div className="flex gap-2">
@@ -214,7 +215,7 @@ export const Templates: React.FC = () => {
             {/* Create/Edit Modal - Lifted */}
             {isCreating && (
                 <div className="fixed inset-0 z-[1001] bg-black/60 backdrop-blur-md flex items-end sm:items-center justify-center">
-                    <div className="bg-white dark:bg-[#1C1C1E] w-full max-w-md sm:rounded-3xl rounded-t-3xl p-6 pb-12 shadow-2xl animate-in slide-in-from-bottom-10 fade-in-20">
+                    <div className="glass-panel w-full max-w-md sm:rounded-3xl rounded-t-3xl p-6 pb-12 shadow-2xl animate-in slide-in-from-bottom-10 fade-in-20 !bg-white/90 dark:!bg-[#1C1C1E]/90">
                         <h3 className="text-xl font-black dark:text-white mb-6">
                             {templateToEdit ? 'Edit Template' : 'New Template'}
                         </h3>
@@ -222,20 +223,20 @@ export const Templates: React.FC = () => {
                             <div>
                                 <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Category</label>
                                 <select
-                                    className="w-full h-12 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-4 font-bold text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary/50"
+                                    className="w-full h-12 rounded-xl border border-gray-200 dark:border-white/10 glass-input px-4 font-bold text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary/50"
                                     value={newTemplate.category}
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                     onChange={e => setNewTemplate({ ...newTemplate, category: e.target.value as any })}
                                 >
                                     {TEMPLATE_CATEGORIES.map(cat => (
-                                        <option key={cat.id} value={cat.id}>{cat.label}</option>
+                                        <option key={cat.id} value={cat.id} className="text-black dark:text-white bg-white dark:bg-gray-800">{cat.label}</option>
                                     ))}
                                 </select>
                             </div>
                             <div>
                                 <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Message</label>
                                 <textarea
-                                    className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 p-4 h-32 text-base leading-relaxed text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                                    className="w-full rounded-xl border border-gray-200 dark:border-white/10 glass-input p-4 h-32 text-base leading-relaxed text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                                     placeholder="Hey {NAME}, ..."
                                     value={newTemplate.text}
                                     onChange={e => setNewTemplate({ ...newTemplate, text: e.target.value })}
@@ -245,7 +246,7 @@ export const Templates: React.FC = () => {
                             <div className="flex gap-4 pt-4">
                                 <button
                                     onClick={resetForm}
-                                    className="flex-1 h-12 rounded-xl border border-gray-200 dark:border-white/10 font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                                    className="flex-1 h-12 rounded-xl border border-gray-200 dark:border-white/10 font-bold text-gray-600 dark:text-gray-300 hover:bg-white/10 transition-colors"
                                 >
                                     Cancel
                                 </button>

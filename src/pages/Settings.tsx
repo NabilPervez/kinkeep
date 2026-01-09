@@ -38,8 +38,8 @@ export const Settings: React.FC = () => {
     };
 
     return (
-        <div className="flex-1 flex flex-col h-screen bg-background-light dark:bg-background-dark">
-            <header className="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-gray-200 dark:border-white/5 pb-2">
+        <div className="flex-1 flex flex-col h-screen bg-transparent">
+            <header className="sticky top-0 z-50 glass-panel border-b-0 pb-2">
                 <div className="flex items-center justify-between px-4 pt-4 pb-2">
                     <button onClick={() => navigate(-1)} className="flex items-center justify-center size-10 -ml-2 rounded-full text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
                         <span className="material-symbols-outlined">arrow_back</span>
@@ -54,7 +54,7 @@ export const Settings: React.FC = () => {
                 {/* Data Management */}
                 <section>
                     <h2 className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3 pl-1">Data Management</h2>
-                    <div className="bg-surface-light dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-white/5 overflow-hidden">
+                    <div className="glass-card rounded-xl overflow-hidden">
                         <button
                             onClick={handleExport}
                             className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors text-left border-b border-gray-100 dark:border-white/5 last:border-0"
@@ -76,7 +76,7 @@ export const Settings: React.FC = () => {
                 {/* Danger Zone */}
                 <section>
                     <h2 className="text-xs font-bold text-red-500 uppercase tracking-wide mb-3 pl-1">Danger Zone</h2>
-                    <div className="bg-surface-light dark:bg-surface-dark rounded-xl border border-red-100 dark:border-red-900/30 overflow-hidden">
+                    <div className="glass-card rounded-xl border-red-100 dark:border-red-900/30 overflow-hidden">
                         <button
                             onClick={handleNuke}
                             className="w-full flex items-center justify-between p-4 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors text-left"

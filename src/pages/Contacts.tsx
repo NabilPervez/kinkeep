@@ -122,8 +122,8 @@ export const Contacts: React.FC = () => {
     };
 
     return (
-        <div className="flex-1 flex flex-col h-screen bg-background-light dark:bg-background-dark relative">
-            <header className="sticky top-0 z-40 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-gray-200 dark:border-white/5 pb-2">
+        <div className="flex-1 flex flex-col h-screen bg-transparent relative">
+            <header className="sticky top-0 z-40 glass-panel border-b-0 pb-2">
                 <div className="flex items-center justify-between px-4 pt-4 pb-2">
                     <h1 className="text-2xl font-black leading-tight tracking-tight">Contacts</h1>
                     <div className="flex gap-2 relative">
@@ -131,23 +131,23 @@ export const Contacts: React.FC = () => {
                         <div className="relative">
                             <button
                                 onClick={() => setShowExportMenu(!showExportMenu)}
-                                className="flex items-center justify-center size-10 rounded-full bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10 text-gray-900 dark:text-white transition-all active:scale-95 shadow-sm"
+                                className="flex items-center justify-center size-10 rounded-full glass-input hover:bg-white/20 text-gray-900 dark:text-white transition-all active:scale-95 shadow-sm"
                             >
                                 <span className="material-symbols-outlined font-bold">download</span>
                             </button>
 
                             {showExportMenu && (
-                                <div className="absolute top-full right-0 mt-2 w-32 bg-white dark:bg-[#1E2130] rounded-xl shadow-xl border border-gray-200 dark:border-white/10 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
+                                <div className="absolute top-full right-0 mt-2 w-32 glass-panel rounded-xl shadow-xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
                                     <button
                                         onClick={() => handleExport('csv')}
-                                        className="w-full px-4 py-3 text-left text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5 flex items-center gap-2"
+                                        className="w-full px-4 py-3 text-left text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-white/10 flex items-center gap-2"
                                     >
                                         <span className="material-symbols-outlined text-[18px]">csv</span> CSV
                                     </button>
-                                    <div className="h-px bg-gray-100 dark:bg-white/5"></div>
+                                    <div className="h-px bg-white/10"></div>
                                     <button
                                         onClick={() => handleExport('vcf')}
-                                        className="w-full px-4 py-3 text-left text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5 flex items-center gap-2"
+                                        className="w-full px-4 py-3 text-left text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-white/10 flex items-center gap-2"
                                     >
                                         <span className="material-symbols-outlined text-[18px]">contact_page</span> VCF
                                     </button>
@@ -160,7 +160,7 @@ export const Contacts: React.FC = () => {
                             <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setShowExportMenu(false)}></div>
                         )}
 
-                        <Link to="/import" className="flex items-center justify-center size-10 rounded-full bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10 text-gray-900 dark:text-white transition-all active:scale-95 shadow-sm">
+                        <Link to="/import" className="flex items-center justify-center size-10 rounded-full glass-input hover:bg-white/20 text-gray-900 dark:text-white transition-all active:scale-95 shadow-sm">
                             <span className="material-symbols-outlined font-bold">upload_file</span>
                         </Link>
                     </div>
@@ -169,11 +169,11 @@ export const Contacts: React.FC = () => {
                 {/* Search & Filter Bar */}
                 <div className="px-4 pb-2 space-y-2">
                     <div className="relative">
-                        <span className="material-symbols-outlined absolute left-3 top-2.5 text-gray-400">search</span>
+                        <span className="material-symbols-outlined absolute left-3 top-2.5 text-gray-500">search</span>
                         <input
                             type="text"
                             placeholder="Search contacts..."
-                            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-surface-light dark:bg-surface-dark border-transparent focus:border-primary focus:ring-0 text-sm font-medium transition-all"
+                            className="w-full pl-10 pr-4 py-2.5 rounded-xl glass-input focus:ring-0 text-sm font-medium transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400"
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                         />
@@ -183,16 +183,16 @@ export const Contacts: React.FC = () => {
                         <select
                             value={filterCategory}
                             onChange={e => setFilterCategory(e.target.value)}
-                            className="px-3 py-1.5 rounded-lg bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-white/10 text-xs font-bold text-gray-600 dark:text-gray-300 whitespace-nowrap"
+                            className="px-3 py-1.5 rounded-lg glass-input text-xs font-bold text-gray-600 dark:text-gray-300 whitespace-nowrap"
                         >
-                            {categoryOptions.map(o => <option key={o.val} value={o.val}>{o.label}</option>)}
+                            {categoryOptions.map(o => <option key={o.val} value={o.val} className="text-black dark:text-white bg-white dark:bg-gray-800">{o.label}</option>)}
                         </select>
                         <select
                             value={filterFrequency}
                             onChange={e => setFilterFrequency(e.target.value)}
-                            className="px-3 py-1.5 rounded-lg bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-white/10 text-xs font-bold text-gray-600 dark:text-gray-300 whitespace-nowrap"
+                            className="px-3 py-1.5 rounded-lg glass-input text-xs font-bold text-gray-600 dark:text-gray-300 whitespace-nowrap"
                         >
-                            {frequencyOptions.map(o => <option key={o.val} value={o.val}>{o.label}</option>)}
+                            {frequencyOptions.map(o => <option key={o.val} value={o.val} className="text-black dark:text-white bg-white dark:bg-gray-800">{o.label}</option>)}
                         </select>
                     </div>
                 </div>
@@ -208,7 +208,7 @@ export const Contacts: React.FC = () => {
                     <div className="space-y-6 pt-4">
                         {sortedLetters.map(letter => (
                             <div key={letter} className="relative">
-                                <h3 className="sticky top-0 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm px-2 py-1 text-xs font-bold text-gray-500 uppercase z-10 w-full mb-2">
+                                <h3 className="sticky top-0 glass-panel px-2 py-1 text-xs font-bold text-gray-500 uppercase z-10 w-full mb-2 rounded-lg">
                                     {letter}
                                 </h3>
                                 <div className="space-y-2">
@@ -216,7 +216,7 @@ export const Contacts: React.FC = () => {
                                         const freq = getFrequencyLabel(contact.frequencyDays);
                                         const dayInfo = getDayLabel(contact.preferredDayOfWeek);
                                         return (
-                                            <div key={contact.id} className="group flex items-center justify-between p-3 rounded-2xl bg-surface-light dark:bg-surface-dark active:scale-[0.99] transition-all hover:shadow-sm border border-transparent hover:border-gray-100 dark:hover:border-white/5">
+                                            <div key={contact.id} className="group flex items-center justify-between p-3 rounded-2xl glass-card active:scale-[0.99] transition-all hover:shadow-md">
                                                 <div className="flex items-center gap-3 flex-1 min-w-0" onClick={() => setSelectedContactId(contact.id)}>
                                                     <div className={clsx(
                                                         "flex items-center justify-center rounded-full size-12 font-bold text-lg shrink-0 text-white",

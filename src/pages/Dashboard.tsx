@@ -70,9 +70,9 @@ export const Dashboard: React.FC = () => {
     };
 
     const renderContactCard = (c: Contact, isCritical: boolean, isContacted: boolean = false, isSnoozed: boolean = false) => (
-        <div key={c.id} className="p-4 rounded-2xl bg-white dark:bg-[#1E2130] border border-transparent dark:border-white/5 shadow-sm dark:shadow-neo-dark flex items-center justify-between group h-[88px] animate-in fade-in zoom-in-95 duration-300 break-inside-avoid">
+        <div key={c.id} className="p-4 rounded-2xl glass-card flex items-center justify-between group h-[88px] animate-in fade-in zoom-in-95 duration-300 break-inside-avoid shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center gap-4 min-w-0">
-                <div className="relative flex items-center justify-center size-12 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-white/5 dark:to-white/10 text-xl font-bold dark:text-gray-300 overflow-hidden shrink-0">
+                <div className="relative flex items-center justify-center size-12 rounded-2xl bg-white/40 dark:bg-white/10 text-xl font-bold dark:text-gray-300 overflow-hidden shrink-0 backdrop-blur-sm">
                     {c.avatarImage ? (
                         <img src={c.avatarImage} alt={c.firstName} className="size-full object-cover" />
                     ) : (
@@ -82,14 +82,14 @@ export const Dashboard: React.FC = () => {
                 <div className="min-w-0 flex-1">
                     <h3 className="font-bold text-lg leading-tight dark:text-white truncate">{c.firstName} {c.lastName}</h3>
                     <div className="flex flex-col mt-0.5">
-                        <p className={clsx("text-xs font-bold flex items-center gap-1", isCritical ? "text-red-500" : "text-gray-400")}>
+                        <p className={clsx("text-xs font-bold flex items-center gap-1", isCritical ? "text-red-500" : "text-gray-500 dark:text-gray-300")}>
                             <span className="material-symbols-outlined text-[14px]">
                                 {c.isBirthdayUpcoming ? 'cake' : 'event'}
                             </span>
                             {c.isBirthdayUpcoming ? 'Birthday' : (isSnoozed ? 'Snoozed' : (isCritical ? 'Overdue' : 'Next'))}: {isSnoozed && c.snoozedUntil ? format(c.snoozedUntil, 'MMM d') : formatStatus(c)}
                         </p>
                         {c.lastContacted > 0 && !isContacted && (
-                            <p className="text-[10px] text-gray-300 dark:text-gray-600 flex items-center gap-1 mt-0.5">
+                            <p className="text-[10px] text-gray-400 dark:text-gray-500 flex items-center gap-1 mt-0.5">
                                 <span className="material-symbols-outlined text-[10px]">history</span>
                                 {format(c.lastContacted, 'MMM d')}
                             </p>
@@ -102,8 +102,8 @@ export const Dashboard: React.FC = () => {
                 <div className={clsx(
                     "size-6 flex items-center justify-center rounded-full border transition-colors",
                     isContacted ? "bg-green-500 border-green-500 text-white" :
-                        isSnoozed ? "bg-orange-100 dark:bg-orange-900/20 border-orange-200 dark:border-orange-500/50 text-orange-500" :
-                            "border-gray-300 dark:border-gray-600 text-transparent"
+                        isSnoozed ? "bg-orange-100 dark:bg-orange-900/40 border-orange-200 dark:border-orange-500/50 text-orange-500" :
+                            "border-gray-300 dark:border-white/10 text-transparent"
                 )}>
                     {isContacted && <span className="material-symbols-outlined text-[16px] font-bold">check</span>}
                     {isSnoozed && <span className="material-symbols-outlined text-[16px]">snooze</span>}
@@ -118,7 +118,7 @@ export const Dashboard: React.FC = () => {
                         "size-10 rounded-full flex items-center justify-center shadow-sm transition-all active:scale-95",
                         isCritical
                             ? "bg-primary text-white shadow-primary/30"
-                            : "bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:bg-primary hover:text-white"
+                            : "bg-white/50 dark:bg-white/10 text-gray-500 dark:text-gray-400 hover:bg-primary hover:text-white backdrop-blur-sm"
                     )}
                 >
                     <span className="material-symbols-outlined">send</span>
@@ -130,8 +130,8 @@ export const Dashboard: React.FC = () => {
     const categoryOptions = [{ id: 'all', label: 'All' }, ...CATEGORIES];
 
     return (
-        <div className="flex-1 flex flex-col h-screen bg-background-light dark:bg-background-dark">
-            <header className="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-gray-200 dark:border-white/5 pb-2">
+        <div className="flex-1 flex flex-col h-screen bg-transparent">
+            <header className="sticky top-0 z-50 glass-panel border-b-0 pb-2">
                 <div className="flex items-center justify-between px-6 pt-12 pb-2">
                     <div className="flex items-center gap-2 md:hidden"> {/* Only show KinKeep on mobile header if sidebar is hidden */}
                         <div className="flex items-center justify-center size-8 rounded-lg bg-primary text-white font-bold shadow-lg shadow-primary/25">
