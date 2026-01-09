@@ -7,6 +7,7 @@ import type { Contact } from '../types';
 import { sounds } from '../utils/sounds';
 import Papa from 'papaparse';
 import clsx from 'clsx';
+import { CATEGORIES, FREQUENCIES, DAYS_OF_WEEK } from '../constants';
 
 export const Contacts: React.FC = () => {
     const navigate = useNavigate();
@@ -35,23 +36,13 @@ export const Contacts: React.FC = () => {
     // Valid schedule options
     const frequencyOptions = [
         { val: 'all', label: 'All Schedules' },
-        { val: '1', label: 'Daily' },
-        { val: '3', label: 'Every 3 Days' },
-        { val: '7', label: 'Weekly' },
-        { val: '14', label: 'Bi-Weekly' },
-        { val: '30', label: 'Monthly' },
-        { val: '90', label: 'Quarterly' },
-        { val: '365', label: 'Yearly' },
+        ...FREQUENCIES.map(f => ({ val: f.value.toString(), label: f.label }))
     ];
 
     // Valid categories
     const categoryOptions = [
         { val: 'all', label: 'All Categories' },
-        { val: 'islamic', label: 'Islamic' },
-        { val: 'friends', label: 'Friends' },
-        { val: 'colleagues', label: 'Colleagues' },
-        { val: 'network', label: 'Network' },
-        { val: 'other', label: 'Other' },
+        ...CATEGORIES.map(c => ({ val: c.id, label: c.label }))
     ];
 
     // Group by First Letter
@@ -98,29 +89,30 @@ export const Contacts: React.FC = () => {
 
     // Helpers for display
     const getFrequencyLabel = (days: number) => {
-        if (days === 1) return { label: 'Daily', color: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300' };
-        if (days === 3) return { label: 'Every 3d', color: 'bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300' };
-        if (days === 7) return { label: 'Weekly', color: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300' };
-        if (days === 14) return { label: 'Bi-Weekly', color: 'bg-lime-100 text-lime-700 dark:bg-lime-500/20 dark:text-lime-300' };
-        if (days === 30) return { label: 'Monthly', color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300' };
-        if (days === 90) return { label: 'Quarterly', color: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-500/20 dark:text-cyan-300' };
-        return { label: 'Yearly', color: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300' };
+        const freq = FREQUENCIES.find(f => f.value === days);
+        return {
+            label: freq?.label ?? 'Unknown',
+            color: freq?.colorClass ?? 'bg-gray-100 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300'
+        };
     };
 
     const getDayLabel = (day?: number) => {
         if (day === undefined) return null;
-        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        return { label: days[day], color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300' };
+        const dayObj = DAYS_OF_WEEK.find(d => d.value === day);
+        return {
+            label: dayObj?.label ?? '?',
+            color: dayObj?.colorClass ?? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300'
+        };
     };
 
-    const getCategoryStyle = (cat?: string) => {
-        switch (cat) {
-            case 'islamic': return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300';
-            case 'friends': return 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300';
-            case 'colleagues': return 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300';
-            case 'network': return 'bg-gray-100 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300';
-            default: return 'bg-gray-100 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300';
-        }
+    const getCategoryStyle = (catId?: string) => {
+        const cat = CATEGORIES.find(c => c.id === catId);
+        return cat?.colorClass ?? 'bg-gray-100 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300';
+    };
+
+    const getCategoryBadgeColor = (catId?: string) => {
+        const cat = CATEGORIES.find(c => c.id === catId);
+        return cat?.badgeColor ?? 'bg-gray-400';
     };
 
     const handleExport = (type: 'csv' | 'vcf') => {
@@ -130,8 +122,8 @@ export const Contacts: React.FC = () => {
     };
 
     return (
-        <div className="flex-1 flex flex-col h-screen bg-background-light dark:bg-background-dark">
-            <header className="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-gray-200 dark:border-white/5 pb-2">
+        <div className="flex-1 flex flex-col h-screen bg-background-light dark:bg-background-dark relative">
+            <header className="sticky top-0 z-40 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-gray-200 dark:border-white/5 pb-2">
                 <div className="flex items-center justify-between px-4 pt-4 pb-2">
                     <h1 className="text-2xl font-black leading-tight tracking-tight">Contacts</h1>
                     <div className="flex gap-2 relative">
@@ -170,9 +162,6 @@ export const Contacts: React.FC = () => {
 
                         <Link to="/import" className="flex items-center justify-center size-10 rounded-full bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10 text-gray-900 dark:text-white transition-all active:scale-95 shadow-sm">
                             <span className="material-symbols-outlined font-bold">upload_file</span>
-                        </Link>
-                        <Link to="/add-contact" className="flex items-center justify-center size-10 rounded-full bg-primary hover:bg-primary/90 text-black shadow-lg shadow-primary/20 transition-all active:scale-95">
-                            <span className="material-symbols-outlined font-bold">add</span>
                         </Link>
                     </div>
                 </div>
@@ -231,10 +220,7 @@ export const Contacts: React.FC = () => {
                                                 <div className="flex items-center gap-3 flex-1 min-w-0" onClick={() => setSelectedContactId(contact.id)}>
                                                     <div className={clsx(
                                                         "flex items-center justify-center rounded-full size-12 font-bold text-lg shrink-0 text-white",
-                                                        contact.category === 'islamic' ? "bg-emerald-500" :
-                                                            contact.category === 'friends' ? "bg-blue-500" :
-                                                                contact.category === 'colleagues' ? "bg-purple-500" :
-                                                                    "bg-gray-400"
+                                                        getCategoryBadgeColor(contact.category)
                                                     )}>
                                                         {contact.firstName[0]}
                                                     </div>
@@ -243,7 +229,7 @@ export const Contacts: React.FC = () => {
                                                         <div className="flex flex-wrap items-center gap-1.5">
                                                             {/* Category Label */}
                                                             <span className={clsx("text-[10px] uppercase font-bold px-1.5 py-0.5 rounded", getCategoryStyle(contact.category))}>
-                                                                {contact.category || 'Other'}
+                                                                {CATEGORIES.find(c => c.id === contact.category)?.label || 'Other'}
                                                             </span>
                                                             {/* Frequency Label */}
                                                             <span className={clsx("text-[10px] font-bold px-1.5 py-0.5 rounded", freq.color)}>
@@ -289,6 +275,15 @@ export const Contacts: React.FC = () => {
                     </div>
                 )}
             </main>
+
+            {/* Floating Action Button for Add Contact */}
+            <Link
+                to="/add-contact"
+                onClick={() => sounds.play('click')}
+                className="fixed bottom-24 right-6 md:bottom-8 md:right-8 z-50 flex items-center justify-center size-14 rounded-full bg-primary text-white shadow-xl shadow-primary/30 hover:bg-primary/90 transition-all hover:scale-110 active:scale-95"
+            >
+                <span className="material-symbols-outlined text-[28px]">add</span>
+            </Link>
 
             {/* Connect Modal for quick detail/action */}
             {selectedContactId && (

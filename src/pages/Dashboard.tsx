@@ -10,10 +10,11 @@ import { getNextDueDate } from '../utils/dateUtils';
 import { sounds } from '../utils/sounds';
 import { format, differenceInCalendarDays, isToday, isTomorrow } from 'date-fns';
 import type { Contact } from '../types';
+import { CATEGORIES } from '../constants';
 
 export const Dashboard: React.FC = () => {
     const [filter, setFilter] = useState<'All' | 'Birthdays' | 'Overdue' | 'Upcoming'>('All');
-    const [categoryFilter, setCategoryFilter] = useState<'All' | 'islamic' | 'friends' | 'colleagues' | 'network' | 'other'>('All');
+    const [categoryFilter, setCategoryFilter] = useState<string>('all');
     const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
     const [hasSeenOnboarding, setHasSeenOnboarding] = useState(() => {
         return localStorage.getItem('kinKeep_onboarding_done') === 'true';
@@ -21,8 +22,8 @@ export const Dashboard: React.FC = () => {
 
     const contacts = useLiveQuery(() => db.contacts.toArray()) || [];
 
-    // Filter by category first
-    const filteredByCat = contacts.filter(c => categoryFilter === 'All' || c.category === categoryFilter);
+    // Filter by category first - normalize category checks
+    const filteredByCat = contacts.filter(c => categoryFilter === 'all' || c.category === categoryFilter);
     const sortedContacts = sortContacts(filteredByCat);
 
     const showOnboarding = contacts.length === 0 && !hasSeenOnboarding;
@@ -69,8 +70,8 @@ export const Dashboard: React.FC = () => {
     };
 
     const renderContactCard = (c: Contact, isCritical: boolean, isContacted: boolean = false, isSnoozed: boolean = false) => (
-        <div key={c.id} className="p-4 rounded-2xl bg-white dark:bg-[#1E2130] border border-transparent dark:border-white/5 shadow-sm dark:shadow-neo-dark flex items-center justify-between group h-[88px] animate-in fade-in zoom-in-95 duration-300">
-            <div className="flex items-center gap-4">
+        <div key={c.id} className="p-4 rounded-2xl bg-white dark:bg-[#1E2130] border border-transparent dark:border-white/5 shadow-sm dark:shadow-neo-dark flex items-center justify-between group h-[88px] animate-in fade-in zoom-in-95 duration-300 break-inside-avoid">
+            <div className="flex items-center gap-4 min-w-0">
                 <div className="relative flex items-center justify-center size-12 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-white/5 dark:to-white/10 text-xl font-bold dark:text-gray-300 overflow-hidden shrink-0">
                     {c.avatarImage ? (
                         <img src={c.avatarImage} alt={c.firstName} className="size-full object-cover" />
@@ -78,8 +79,8 @@ export const Dashboard: React.FC = () => {
                         c.firstName[0]
                     )}
                 </div>
-                <div>
-                    <h3 className="font-bold text-lg leading-tight dark:text-white truncate max-w-[150px] sm:max-w-xs">{c.firstName} {c.lastName}</h3>
+                <div className="min-w-0 flex-1">
+                    <h3 className="font-bold text-lg leading-tight dark:text-white truncate">{c.firstName} {c.lastName}</h3>
                     <div className="flex flex-col mt-0.5">
                         <p className={clsx("text-xs font-bold flex items-center gap-1", isCritical ? "text-red-500" : "text-gray-400")}>
                             <span className="material-symbols-outlined text-[14px]">
@@ -96,7 +97,7 @@ export const Dashboard: React.FC = () => {
                     </div>
                 </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 shrink-0">
                 {/* Visual Indicator */}
                 <div className={clsx(
                     "size-6 flex items-center justify-center rounded-full border transition-colors",
@@ -126,16 +127,23 @@ export const Dashboard: React.FC = () => {
         </div>
     );
 
+    const categoryOptions = [{ id: 'all', label: 'All' }, ...CATEGORIES];
+
     return (
         <div className="flex-1 flex flex-col h-screen bg-background-light dark:bg-background-dark">
             <header className="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-gray-200 dark:border-white/5 pb-2">
                 <div className="flex items-center justify-between px-6 pt-12 pb-2">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 md:hidden"> {/* Only show KinKeep on mobile header if sidebar is hidden */}
                         <div className="flex items-center justify-center size-8 rounded-lg bg-primary text-white font-bold shadow-lg shadow-primary/25">
                             <span className="material-symbols-outlined text-[20px]">favorite</span>
                         </div>
                         <h1 className="text-xl font-black tracking-tight text-gray-900 dark:text-white">KinKeep</h1>
                     </div>
+                    {/* Spacer for desktop alignment if needed or just hidden title */}
+                    <div className="hidden md:block">
+                        <h1 className="text-xl font-black tracking-tight text-gray-900 dark:text-white">Dashboard</h1>
+                    </div>
+
                     <div className="flex gap-2">
                         <Link
                             to="/settings"
@@ -147,7 +155,7 @@ export const Dashboard: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="flex flex-col gap-2 pb-2">
+                <div className="flex flex-col md:flex-row md:items-center gap-2 pb-2">
                     {/* Status Filters */}
                     <div className="px-6 overflow-x-auto no-scrollbar flex gap-2">
                         {['All', 'Birthdays', 'Overdue', 'Upcoming'].map(f => (
@@ -172,22 +180,21 @@ export const Dashboard: React.FC = () => {
 
                     {/* Category Filters */}
                     <div className="px-6 overflow-x-auto no-scrollbar flex gap-2">
-                        {['All', 'islamic', 'friends', 'colleagues', 'network'].map(c => (
+                        {categoryOptions.map(c => (
                             <button
-                                key={c}
+                                key={c.id}
                                 onClick={() => {
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    setCategoryFilter(c as any);
+                                    setCategoryFilter(c.id);
                                     sounds.play('pop');
                                 }}
                                 className={clsx(
                                     "px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wide transition-all whitespace-nowrap border",
-                                    categoryFilter === c
+                                    categoryFilter === c.id
                                         ? "bg-gray-900 dark:bg-white text-white dark:text-black border-transparent"
                                         : "bg-transparent text-gray-400 border-gray-200 dark:border-white/10 hover:border-gray-400"
                                 )}
                             >
-                                {c}
+                                {c.label}
                             </button>
                         ))}
                     </div>
@@ -212,7 +219,7 @@ export const Dashboard: React.FC = () => {
                                     {snoozedContacts.length}
                                 </span>
                             </div>
-                            <div className="space-y-3 opacity-90">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 auto-rows-max opacity-90">
                                 {snoozedContacts.map(c => renderContactCard(c, false, false, true))}
                             </div>
                         </section>
@@ -227,7 +234,7 @@ export const Dashboard: React.FC = () => {
                                     {criticalContacts.length}
                                 </span>
                             </div>
-                            <div className="space-y-3">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 auto-rows-max">
                                 {criticalContacts.map(c => renderContactCard(c, true))}
                             </div>
                         </section>
@@ -243,7 +250,7 @@ export const Dashboard: React.FC = () => {
                                         <h3 className="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider pl-1 mb-3">
                                             {label}
                                         </h3>
-                                        <div className="space-y-3">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 auto-rows-max">
                                             {contactsInGroup.map(c => renderContactCard(c, false, isToday(c.lastContacted)))}
                                         </div>
                                     </div>

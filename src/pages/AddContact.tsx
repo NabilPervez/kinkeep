@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { sounds } from '../utils/sounds';
 import clsx from 'clsx';
+import { CATEGORIES, FREQUENCIES, DAYS_OF_WEEK } from '../constants';
 
 export const AddContact: React.FC = () => {
     const navigate = useNavigate();
@@ -90,12 +91,7 @@ export const AddContact: React.FC = () => {
                     <span className="material-symbols-outlined">arrow_back</span>
                 </button>
                 <h1 className="text-lg font-bold">{id ? 'Edit Contact' : 'New Contact'}</h1>
-                <button
-                    onClick={handleSubmit}
-                    className="px-4 py-2 rounded-full bg-primary text-white font-bold text-sm shadow-lg shadow-primary/25 hover:bg-primary-dark transition-all"
-                >
-                    Save
-                </button>
+                <div className="size-10"></div> {/* Spacer for removed save button */}
             </header>
 
             <main className="flex-1 flex flex-col max-w-lg mx-auto w-full">
@@ -149,19 +145,19 @@ export const AddContact: React.FC = () => {
                     <div className="space-y-3">
                         <label className="block text-sm font-bold text-gray-700 dark:text-gray-300" htmlFor="category">Category</label>
                         <div className="grid grid-cols-3 gap-2">
-                            {['islamic', 'friends', 'colleagues', 'network'].map(cat => (
+                            {CATEGORIES.map(cat => (
                                 <button
-                                    key={cat}
+                                    key={cat.id}
                                     type="button"
-                                    onClick={() => setFormData(prev => ({ ...prev, category: cat }))}
+                                    onClick={() => setFormData(prev => ({ ...prev, category: cat.id }))}
                                     className={clsx(
                                         "py-2.5 rounded-xl text-sm font-bold capitalize transition-all border",
-                                        formData.category === cat
+                                        formData.category === cat.id
                                             ? "bg-black dark:bg-white text-white dark:text-black border-transparent shadow"
                                             : "bg-surface-light dark:bg-surface-dark border-gray-200 dark:border-white/10 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10"
                                     )}
                                 >
-                                    {cat}
+                                    {cat.label}
                                 </button>
                             ))}
                         </div>
@@ -196,42 +192,37 @@ export const AddContact: React.FC = () => {
                             onChange={handleChange}
                             className="w-full h-12 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 font-medium appearance-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
                         >
-                            <option value="1">Daily</option>
-                            <option value="3">Every 3 Days</option>
-                            <option value="7">Weekly</option>
-                            <option value="14">Every 2 Weeks</option>
-                            <option value="30">Monthly</option>
-                            <option value="90">Every 3 Months</option>
-                            <option value="180">Every 6 Months</option>
-                            <option value="365">Yearly</option>
+                            {FREQUENCIES.map(f => (
+                                <option key={f.value} value={f.value}>{f.label}</option>
+                            ))}
                         </select>
                     </div>
 
-                    {/* Preferred Day - Now shown for all frequencies by user request */}
+                    {/* Preferred Day */}
                     <div className="animate-in fade-in slide-in-from-top-2">
                         <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">
                             Preferred Day (Optional)
                         </label>
                         <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
-                            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => (
+                            {DAYS_OF_WEEK.map((day) => (
                                 <button
-                                    key={day}
+                                    key={day.value}
                                     type="button"
                                     onClick={() => {
                                         sounds.play('click');
                                         setFormData(prev => ({
                                             ...prev,
-                                            preferredDayOfWeek: prev.preferredDayOfWeek === idx.toString() ? '' : idx.toString()
+                                            preferredDayOfWeek: prev.preferredDayOfWeek === day.value.toString() ? '' : day.value.toString()
                                         }));
                                     }}
                                     className={clsx(
                                         "h-10 rounded-lg text-xs font-bold transition-all border",
-                                        formData.preferredDayOfWeek === idx.toString()
+                                        formData.preferredDayOfWeek === day.value.toString()
                                             ? "bg-black dark:bg-white text-white dark:text-black border-transparent shadow-md"
                                             : "bg-surface-light dark:bg-surface-dark border-gray-200 dark:border-white/10 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10"
                                     )}
                                 >
-                                    {day}
+                                    {day.label}
                                 </button>
                             ))}
                         </div>
@@ -240,7 +231,7 @@ export const AddContact: React.FC = () => {
                         </p>
                     </div>
 
-                    <div className="fixed bottom-0 left-0 w-full z-40 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-t border-gray-200 dark:border-white/5 p-4 pb-safe flex flex-col gap-3">
+                    <div className="fixed bottom-0 right-0 left-0 md:left-64 z-40 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-t border-gray-200 dark:border-white/5 p-4 pb-safe flex flex-col gap-3">
                         <button className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-primary hover:bg-primary/90 text-black text-base font-bold shadow-[0_0_20px_rgba(242,87,87,0.3)] transition-all transform active:scale-[0.98]" type="submit">
                             <span className="material-symbols-outlined font-bold">check</span>
                             Save Contact

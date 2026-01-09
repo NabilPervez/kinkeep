@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/db';
 import { v4 as uuidv4 } from 'uuid';
@@ -6,11 +6,12 @@ import clsx from 'clsx';
 import type { Template } from '../types';
 import { sounds } from '../utils/sounds';
 import { useNavigate } from 'react-router-dom';
+import { TEMPLATE_CATEGORIES } from '../constants';
 
 export const Templates: React.FC = () => {
     const navigate = useNavigate();
-    const [filter, setFilter] = useState<'All' | 'Islamic' | 'Friends' | 'Colleagues' | 'Network' | 'Birthday' | 'Other'>('All');
-    const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const [filter, setFilter] = useState<string>('all');
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Simple state for creating new template (inline or modal? let's do inline for simplicity)
     const [isCreating, setIsCreating] = useState(false);
@@ -24,12 +25,10 @@ export const Templates: React.FC = () => {
         setIsCreating(false);
     };
 
-    // Populate form in handleEditClick, not effect
-
     const templates = useLiveQuery(() => db.templates.toArray()) || [];
 
     const filteredTemplates = templates.filter(t => {
-        if (filter === 'All') return true;
+        if (filter === 'all') return true;
         return t.category.toLowerCase() === filter.toLowerCase();
     });
 
@@ -117,6 +116,8 @@ export const Templates: React.FC = () => {
         reader.readAsText(file);
     };
 
+    const filterOptions = [{ id: 'all', label: 'All' }, ...TEMPLATE_CATEGORIES];
+
     return (
         <div className="flex-1 flex flex-col h-screen bg-background-light dark:bg-background-dark">
             <input
@@ -161,36 +162,35 @@ export const Templates: React.FC = () => {
 
                 {/* Filter Chips */}
                 <div className="px-6 pb-2 overflow-x-auto no-scrollbar flex gap-2">
-                    {['All', 'Islamic', 'Friends', 'Colleagues', 'Network', 'Birthday', 'Other'].map(cat => (
+                    {filterOptions.map(cat => (
                         <button
-                            key={cat}
+                            key={cat.id}
                             onClick={() => {
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                setFilter(cat as any);
+                                setFilter(cat.id);
                                 sounds.play('pop');
                             }}
                             className={clsx(
                                 "px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all whitespace-nowrap",
-                                filter === cat
+                                filter === cat.id
                                     ? "bg-primary text-white shadow-lg shadow-primary/25"
                                     : "bg-white dark:bg-white/5 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-100 dark:border-white/5"
                             )}
                         >
-                            {cat}
+                            {cat.label}
                         </button>
                     ))}
                 </div>
             </header>
 
-            <main className="flex-1 overflow-y-auto no-scrollbar pb-32 px-6 pt-4 space-y-4">
+            <main className="flex-1 overflow-y-auto no-scrollbar pb-32 px-6 pt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-min">
                 {filteredTemplates.map(template => (
-                    <div key={template.id} className="group relative p-5 rounded-3xl bg-white dark:bg-[#1E2130] border border-transparent dark:border-white/5 shadow-sm dark:shadow-neo-dark hover:scale-[1.01] transition-all duration-300">
+                    <div key={template.id} className="group relative p-5 rounded-3xl bg-white dark:bg-[#1E2130] border border-transparent dark:border-white/5 shadow-sm dark:shadow-neo-dark hover:scale-[1.01] transition-all duration-300 break-inside-avoid">
                         <p className="text-base font-medium leading-relaxed text-gray-800 dark:text-gray-200 pr-0 mb-3">
                             "{template.text}"
                         </p>
                         <div className="flex items-center justify-between">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 bg-gray-50 dark:bg-white/5 px-2 py-1 rounded-md">
-                                {template.category}
+                                {TEMPLATE_CATEGORIES.find(c => c.id === template.category)?.label || template.category}
                             </span>
                             <div className="flex gap-2">
                                 <button
@@ -227,12 +227,9 @@ export const Templates: React.FC = () => {
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                     onChange={e => setNewTemplate({ ...newTemplate, category: e.target.value as any })}
                                 >
-                                    <option value="friends">Friends</option>
-                                    <option value="islamic">Islamic</option>
-                                    <option value="colleagues">Colleagues</option>
-                                    <option value="network">Network</option>
-                                    <option value="birthday">Birthday</option>
-                                    <option value="other">Other</option>
+                                    {TEMPLATE_CATEGORIES.map(cat => (
+                                        <option key={cat.id} value={cat.id}>{cat.label}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div>
