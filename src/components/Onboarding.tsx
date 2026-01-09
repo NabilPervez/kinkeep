@@ -14,44 +14,46 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
     const steps = [
         {
             title: "Welcome to KinKeep",
-            subtitle: "Your personal relationship assistant.",
-            description: "Stay connected with the people who matter most. Private, local-first, and designed to help you be intentional.",
+            subtitle: "Your personal relationship manager.",
+            description: "KinKeep helps you stay connected with your network by simplifying follow-ups and tracking important dates. Use it to build better habits and never lose touch with the people who matter most.",
             icon: "favorite",
             color: "text-primary",
             bg: "bg-primary/10",
-            actionLabel: "Let's Go",
+            actionLabel: "Get Started",
             action: () => setStep(1)
         },
         {
-            title: "Step 1: Bring Your People",
-            subtitle: "Import from anywhere.",
-            description: "Easily import your contacts via CSV or VCF files. Choose who you want to keep in touch with and set your frequency.",
+            title: "Step 1: Import Contacts",
+            subtitle: "Build your network.",
+            description: "Import your contacts using VCF or CSV files, or add them manually. You can set a custom communication cadence—from daily to yearly—to suit each relationship.",
             icon: "group_add",
             color: "text-blue-500",
             bg: "bg-blue-500/10",
-            actionLabel: "Import Contacts",
-            secondaryLabel: "Skip for now",
-            action: () => navigate('/import'),
-            secondaryAction: () => setStep(2)
+            actionLabel: "Next",
+            secondaryLabel: "Import Now",
+            action: () => setStep(2),
+            secondaryAction: () => navigate('/import')
         },
         {
-            title: "Step 2: Perfect Templates",
-            subtitle: "Say the right thing.",
-            description: "Browse and customize message templates for birthdays, check-ins, and more. Never struggle with what to say again.",
+            title: "Step 2: Update Templates",
+            subtitle: "Make it personal.",
+            description: "Review and customize your message templates. Whether it's a birthday wish or a casual check-in, set up messages that sound like you across all your categories.",
             icon: "edit_note",
             color: "text-purple-500",
             bg: "bg-purple-500/10",
-            actionLabel: "Next Step",
-            action: () => setStep(3)
+            actionLabel: "Next",
+            secondaryLabel: "View Templates",
+            action: () => setStep(3),
+            secondaryAction: () => navigate('/templates')
         },
         {
-            title: "Step 3: Connect Instantly",
-            subtitle: "Swipe, Tap, Send.",
-            description: "Reach out via SMS, WhatsApp, or Telegram in seconds. We'll even remind you when it's time to reconnect.",
-            icon: "send",
+            title: "Step 3: Start Connecting",
+            subtitle: "Your daily dashboard.",
+            description: "Use your dashboard to see who you need to contact each day. It prioritizes your outreach so you can focus on connecting with zero stress.",
+            icon: "dashboard",
             color: "text-green-500",
             bg: "bg-green-500/10",
-            actionLabel: "Get Started",
+            actionLabel: "Go to Dashboard",
             action: () => {
                 setIsExiting(true);
                 setTimeout(onComplete, 300);
