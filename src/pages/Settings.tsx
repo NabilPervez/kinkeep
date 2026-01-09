@@ -51,6 +51,28 @@ export const Settings: React.FC = () => {
 
             <main className="flex-1 overflow-y-auto no-scrollbar p-4 space-y-6">
 
+                {/* Tools */}
+                <section>
+                    <h2 className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3 pl-1">Tools</h2>
+                    <div className="glass-card rounded-xl overflow-hidden">
+                        <button
+                            onClick={() => navigate('/planning')}
+                            className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors text-left border-b border-gray-100 dark:border-white/5 last:border-0"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="size-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                                    <span className="material-symbols-outlined text-[18px]">calendar_month</span>
+                                </div>
+                                <div>
+                                    <h4 className="font-medium text-sm">Outreach Planner</h4>
+                                    <p className="text-xs text-gray-500">Rapidly schedule your contacts</p>
+                                </div>
+                            </div>
+                            <span className="material-symbols-outlined text-gray-400">chevron_right</span>
+                        </button>
+                    </div>
+                </section>
+
                 {/* Data Management */}
                 <section>
                     <h2 className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3 pl-1">Data Management</h2>

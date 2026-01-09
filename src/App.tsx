@@ -5,6 +5,7 @@ import { AddContact } from './pages/AddContact';
 import { ImportWizard } from './pages/ImportWizard';
 import { Templates } from './pages/Templates';
 import { Contacts } from './pages/Contacts';
+import { Planning } from './pages/Planning';
 import { Settings } from './pages/Settings';
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/import" element={<ImportWizard />} />
           <Route path="/templates" element={<Templates />} />
           <Route path="/contacts" element={<Contacts />} />
+          <Route path="/planning" element={<Planning />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </Layout>

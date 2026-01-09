@@ -74,21 +74,23 @@ export const Dashboard: React.FC = () => {
         // Zone A: Focus Contact (Highest Priority)
         const focusContact = criticalContacts[0] || upcomingContacts[0];
 
-        // Zone B: Velocity Stats (Contacts this week)
-        const contactsSameWeek = sortedContacts.filter(c => {
-            const diff = differenceInCalendarDays(Date.now(), c.lastContacted);
-            return diff < 7 && diff >= 0;
-        }).length;
-
-        // Zone D: List Feed (Remaining Upcoming)
+        // Zone D: List Feed (Remaining Upcoming) - Now includes everyone NOT the focus contact
         const feedContacts = [...criticalContacts, ...upcomingContacts].filter(c => c.id !== focusContact?.id);
 
+        // Group feed contacts by status label
+        const groupedFeed = feedContacts.reduce((acc, contact) => {
+            const status = formatStatus(contact);
+            if (!acc[status]) acc[status] = [];
+            acc[status].push(contact);
+            return acc;
+        }, {} as Record<string, Contact[]>);
+
         return (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 p-4 pb-32 max-w-7xl mx-auto w-full">
+            <div className="flex flex-col gap-6 p-4 pb-32 max-w-lg mx-auto w-full">
 
                 {/* Zone A: Focus Contact */}
                 {focusContact ? (
-                    <div className="col-span-2 lg:col-span-2 row-span-2 glass-card rounded-3xl p-6 relative overflow-hidden group flex flex-col justify-between min-h-[300px] animate-in slide-in-from-bottom-5 duration-500">
+                    <div className="glass-card rounded-3xl p-6 relative overflow-hidden group flex flex-col justify-between min-h-[350px] animate-in slide-in-from-bottom-5 duration-500">
                         <div className="absolute top-0 right-0 p-4 opacity-50">
                             <span className="material-symbols-outlined text-[100px] text-white/5 -rotate-12 translate-x-4 -translate-y-4">
                                 {focusContact.isBirthdayUpcoming ? 'cake' : 'star'}
@@ -107,8 +109,8 @@ export const Dashboard: React.FC = () => {
                                 <span className="text-white/60 text-xs font-semibold">{formatStatus(focusContact)}</span>
                             </div>
 
-                            <div className="flex flex-col items-center text-center mt-4">
-                                <div className="size-24 rounded-full bg-gradient-to-br from-white/10 to-white/5 p-1 mb-4 shadow-2xl ring-1 ring-white/20">
+                            <div className="flex flex-col items-center text-center mt-6">
+                                <div className="size-28 rounded-full bg-gradient-to-br from-white/10 to-white/5 p-1 mb-5 shadow-2xl ring-1 ring-white/20">
                                     <div className="size-full rounded-full overflow-hidden bg-zinc-800">
                                         {focusContact.avatarImage ? (
                                             <img src={focusContact.avatarImage} alt={focusContact.firstName} className="size-full object-cover" />
@@ -126,83 +128,67 @@ export const Dashboard: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="pt-6">
+                        <div className="pt-8">
                             <button
                                 onClick={() => {
                                     setSelectedContactId(focusContact.id);
                                     sounds.play('click');
                                 }}
-                                className="w-full py-4 rounded-xl bg-primary hover:bg-primary-light text-white font-bold text-lg shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                                className="w-full py-4 rounded-xl bg-primary hover:bg-primary-light text-white font-bold text-lg shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                             >
-                                <span className="material-symbols-outlined">call</span>
                                 Connect Now
                             </button>
                         </div>
                     </div>
                 ) : (
-                    <div className="col-span-2 row-span-2 glass-card rounded-3xl p-8 flex flex-col items-center justify-center text-center text-white/60">
+                    <div className="glass-card rounded-3xl p-8 flex flex-col items-center justify-center text-center text-white/60 min-h-[200px]">
                         <span className="material-symbols-outlined text-4xl mb-2">check_circle</span>
                         <p className="font-medium">All caught up!</p>
                     </div>
                 )}
 
-                {/* Zone B: Stats */}
-                <div className="col-span-1 glass-card rounded-3xl p-5 flex flex-col justify-between bg-gradient-to-br from-white/10 to-transparent animate-in slide-in-from-bottom-6 duration-700 delay-100">
-                    <span className="material-symbols-outlined text-2xl text-emerald-400">bolt</span>
-                    <div>
-                        <div className="text-4xl font-black text-white leading-none tracking-tight">{contactsSameWeek}</div>
-                        <div className="text-[10px] font-bold uppercase text-white/40 mt-1 tracking-wider">Velocity</div>
-                    </div>
-                </div>
-
-                {/* Zone C: Quick Action (Snooze/Manage) */}
-                <Link to="/contacts" className="col-span-1 glass-card rounded-3xl p-5 flex flex-col justify-between group hover:bg-white/10 transition-colors animate-in slide-in-from-bottom-6 duration-700 delay-200">
-                    <span className="material-symbols-outlined text-2xl text-blue-400 group-hover:scale-110 transition-transform">group</span>
-                    <div>
-                        <div className="text-2xl font-bold text-white leading-none">{contacts.length}</div>
-                        <div className="text-[10px] font-bold uppercase text-white/40 mt-1 tracking-wider">Network</div>
-                    </div>
-                </Link>
-
-                {/* Zone D: List Feed */}
-                <div className="col-span-2 lg:col-span-2 flex flex-col gap-3">
-                    <div className="flex items-center justify-between px-2">
-                        <h3 className="text-sm font-bold text-white/80 uppercase tracking-widest pl-1">Up Next</h3>
-                        <Link to="/contacts" className="text-xs font-semibold text-primary hover:text-white transition-colors">View All</Link>
-                    </div>
-                    {feedContacts.slice(0, 5).map((c, i) => (
-                        <div
-                            key={c.id}
-                            onClick={() => {
-                                setSelectedContactId(c.id);
-                                sounds.play('click');
-                            }}
-                            className="glass-card p-4 rounded-2xl flex items-center gap-4 hover:bg-white/10 cursor-pointer transition-all active:scale-[0.98] animate-in slide-in-from-bottom-4 fade-in duration-500"
-                            style={{ animationDelay: `${(i + 3) * 100}ms` }}
-                        >
-                            <div className="size-10 rounded-full bg-white/10 flex items-center justify-center text-white font-bold text-sm shrink-0">
-                                {c.avatarImage ? (
-                                    <img src={c.avatarImage} alt={c.firstName} className="size-full rounded-full object-cover" />
-                                ) : c.firstName[0]}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <h4 className="text-white font-bold truncate">{c.firstName} {c.lastName}</h4>
-                                <div className="flex items-center gap-2 mt-0.5">
-                                    <span className={clsx("text-[10px] font-bold px-1.5 py-0.5 rounded text-black/80",
-                                        (c.category as string) === 'islamic' ? 'bg-emerald-400' :
-                                            (c.category as string) === 'family' ? 'bg-indigo-400' : 'bg-white/80'
-                                    )}>
-                                        {c.category || 'Other'}
-                                    </span>
-                                    <span className="text-xs text-white/40 truncate">{formatStatus(c)}</span>
+                {/* Zone D: List Feed (Grouped) */}
+                <div className="flex flex-col gap-6">
+                    {Object.entries(groupedFeed).map(([status, contactsInGroup]) => (
+                        <div key={status} className="flex flex-col gap-3">
+                            <h3 className="text-sm font-bold text-white/80 uppercase tracking-widest pl-1 sticky top-[80px] z-10 py-2 mix-blend-overlay">
+                                {status}
+                            </h3>
+                            {contactsInGroup.map((c, i) => (
+                                <div
+                                    key={c.id}
+                                    onClick={() => {
+                                        setSelectedContactId(c.id);
+                                        sounds.play('click');
+                                    }}
+                                    className="glass-card p-4 rounded-2xl flex items-center gap-4 hover:bg-white/10 cursor-pointer transition-all active:scale-[0.98] animate-in slide-in-from-bottom-4 fade-in duration-500"
+                                    style={{ animationDelay: `${i * 50}ms` }}
+                                >
+                                    <div className="size-10 rounded-full bg-white/10 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                                        {c.avatarImage ? (
+                                            <img src={c.avatarImage} alt={c.firstName} className="size-full rounded-full object-cover" />
+                                        ) : c.firstName[0]}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <h4 className="text-white font-bold truncate">{c.firstName} {c.lastName}</h4>
+                                        <div className="flex items-center gap-2 mt-0.5">
+                                            <span className={clsx("text-[10px] font-bold px-1.5 py-0.5 rounded text-black/80",
+                                                (c.category as string) === 'islamic' ? 'bg-emerald-400' :
+                                                    (c.category as string) === 'family' ? 'bg-indigo-400' : 'bg-white/80'
+                                            )}>
+                                                {c.category || 'Other'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <button className="size-8 rounded-full bg-white/5 hover:bg-primary text-white/60 hover:text-white flex items-center justify-center transition-colors">
+                                        <span className="material-symbols-outlined text-lg">chevron_right</span>
+                                    </button>
                                 </div>
-                            </div>
-                            <button className="size-8 rounded-full bg-white/5 hover:bg-primary text-white/60 hover:text-white flex items-center justify-center transition-colors">
-                                <span className="material-symbols-outlined text-lg">chevron_right</span>
-                            </button>
+                            ))}
                         </div>
                     ))}
-                    {feedContacts.length === 0 && (
+
+                    {feedContacts.length === 0 && !focusContact && (
                         <div className="p-8 text-center text-white/40 text-sm font-medium">No other upcoming contacts</div>
                     )}
                 </div>

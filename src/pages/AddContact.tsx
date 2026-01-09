@@ -232,7 +232,7 @@ export const AddContact: React.FC = () => {
                         </p>
                     </div>
 
-                    <div className="fixed bottom-0 right-0 left-0 md:left-64 z-40 glass-panel border-t-0 p-4 pb-safe flex flex-col gap-3">
+                    <div className="mt-8 flex flex-col gap-3 pb-8">
                         <button className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-primary hover:bg-primary/90 text-black text-base font-bold shadow-[0_0_20px_rgba(242,87,87,0.3)] transition-all transform active:scale-[0.98]" type="submit">
                             <span className="material-symbols-outlined font-bold">check</span>
                             Save Contact

@@ -43,49 +43,31 @@ export class KinKeepDB extends Dexie {
             {
                 "id": "1",
                 "category": "islamic",
-                "text": "As-salaamu alaykum {NAME}! Just checking in and making dua for you. Hope you and the family are well.",
-                "isDefault": true
-            },
-            {
-                "id": "1b",
-                "category": "islamic",
-                "text": "As-salaamu alaykum! Just checking in and making dua for you. Hope you are well.",
+                "text": "Salaam brother. Jummah Mubarak. How are you?",
                 "isDefault": true
             },
             {
                 "id": "2",
                 "category": "friends",
-                "text": "Hey {NAME}! It's been a minute. Just wanted to say hi and see how you're doing?",
-                "isDefault": true
-            },
-            {
-                "id": "2b",
-                "category": "friends",
-                "text": "Hey! It's been a minute. Just wanted to say hi and see how you're doing?",
+                "text": "Hey brother how are you?",
                 "isDefault": true
             },
             {
                 "id": "3",
-                "category": "colleagues",
-                "text": "Hi {NAME}, hope you're having a productive week. Let's catch up soon.",
-                "isDefault": true
-            },
-            {
-                "id": "3b",
-                "category": "colleagues",
-                "text": "Hi there, hope you're having a productive week. Let's catch up soon.",
+                "category": "friends",
+                "text": "Hey man - whats up?",
                 "isDefault": true
             },
             {
                 "id": "4",
                 "category": "birthday",
-                "text": "Happy Birthday {NAME}! Wishing you a fantastic year head full of baraka!",
+                "text": "Happy Birthday! Wishing you a fantastic year ahead.",
                 "isDefault": true
             },
             {
-                "id": "4b",
-                "category": "birthday",
-                "text": "Happy Birthday! Wishing you a fantastic year head full of baraka!",
+                "id": "5",
+                "category": "colleagues",
+                "text": "Hi {NAME}, hope you're having a productive week.",
                 "isDefault": true
             }
         ]);
