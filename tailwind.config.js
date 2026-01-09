@@ -9,15 +9,19 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#8B5CF6', // Violet
-          dark: '#7C3AED',
-          light: '#A78BFA',
+          DEFAULT: '#f25757', // Vibrant Coral
+          dark: '#d64545',
+          light: '#ff7070',
         },
         secondary: {
-          DEFAULT: '#3B82F6', // Blue
+          DEFAULT: '#61e8e1', // Neon Ice
+        },
+        accent: {
+          yellow: '#f2e863', // Banana Cream
+          gold: '#f2cd60', // Royal Gold
         },
         background: {
-          light: '#F3F4F6',
+          light: '#eaf2e3', // Honeydew
           dark: '#0F111A', // Deep Blue-Black
         },
         surface: {

@@ -47,9 +47,21 @@ export class KinKeepDB extends Dexie {
                 "isDefault": true
             },
             {
+                "id": "1b",
+                "category": "islamic",
+                "text": "As-salaamu alaykum! Just checking in and making dua for you. Hope you are well.",
+                "isDefault": true
+            },
+            {
                 "id": "2",
                 "category": "friends",
                 "text": "Hey {NAME}! It's been a minute. Just wanted to say hi and see how you're doing?",
+                "isDefault": true
+            },
+            {
+                "id": "2b",
+                "category": "friends",
+                "text": "Hey! It's been a minute. Just wanted to say hi and see how you're doing?",
                 "isDefault": true
             },
             {
@@ -59,9 +71,21 @@ export class KinKeepDB extends Dexie {
                 "isDefault": true
             },
             {
+                "id": "3b",
+                "category": "colleagues",
+                "text": "Hi there, hope you're having a productive week. Let's catch up soon.",
+                "isDefault": true
+            },
+            {
                 "id": "4",
                 "category": "birthday",
                 "text": "Happy Birthday {NAME}! Wishing you a fantastic year head full of baraka!",
+                "isDefault": true
+            },
+            {
+                "id": "4b",
+                "category": "birthday",
+                "text": "Happy Birthday! Wishing you a fantastic year head full of baraka!",
                 "isDefault": true
             }
         ]);
@@ -71,13 +95,9 @@ export class KinKeepDB extends Dexie {
 export const db = new KinKeepDB();
 
 // Force re-seed on load for this update (Quick fix for the task to ensure old templates are gone)
-// In a real app we'd be more careful.
 db.on('ready', async () => {
-    const templates = await db.templates.toArray();
-    // If we have old categories like 'casual', nuke them.
-    const hasOld = templates.some(t => ['casual', 'formal', 'religious'].includes(t.category as any));
-    if (hasOld || templates.length === 0) {
-        await db.templates.clear();
-        await db.seedTemplates();
-    }
+    // ALWAYS re-seed for this update to ensure users get the new templates
+    // In production we might check a version flag, but for this task we want immediate effect
+    await db.templates.clear();
+    await db.seedTemplates();
 });

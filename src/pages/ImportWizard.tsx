@@ -66,7 +66,8 @@ export const ImportWizard: React.FC = () => {
 
     const currentStage = STAGES[currentStageIndex];
 
-    // Auto-select contacts matching current stage frequency
+    // Auto-select contacts matching current stage frequency - REMOVED per user request
+    /*
     React.useEffect(() => {
         if (step === 2) {
             const available = parsedContacts.filter(c => !processedIds.has(c.id));
@@ -80,6 +81,7 @@ export const ImportWizard: React.FC = () => {
             }
         }
     }, [currentStageIndex, step, parsedContacts, processedIds, currentStage.days]);
+    */
 
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -205,6 +207,15 @@ export const ImportWizard: React.FC = () => {
             <header className="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-gray-200 dark:border-white/5 transition-all">
                 {isSearchVisible && step === 2 ? (
                     <div className="flex items-center gap-2 px-4 py-3 animate-in fade-in slide-in-from-top-2">
+                        <button
+                            onClick={() => {
+                                setIsSearchVisible(false);
+                                setSearchQuery('');
+                            }}
+                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10"
+                        >
+                            <span className="material-symbols-outlined text-gray-500">arrow_back</span>
+                        </button>
                         <span className="material-symbols-outlined text-gray-400">search</span>
                         <input
                             autoFocus
@@ -214,15 +225,6 @@ export const ImportWizard: React.FC = () => {
                             onChange={e => setSearchQuery(e.target.value)}
                             className="flex-1 bg-transparent border-none focus:ring-0 text-gray-900 dark:text-white placeholder-gray-400 p-0"
                         />
-                        <button
-                            onClick={() => {
-                                setIsSearchVisible(false);
-                                setSearchQuery('');
-                            }}
-                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10"
-                        >
-                            <span className="material-symbols-outlined text-gray-500">close</span>
-                        </button>
                     </div>
                 ) : (
                     <div className="flex items-center justify-between px-4 py-3">
@@ -267,12 +269,7 @@ export const ImportWizard: React.FC = () => {
                         <div className="flex-1 flex items-center justify-end gap-1">
                             {step === 2 && (
                                 <>
-                                    <button
-                                        onClick={() => setIsSearchVisible(true)}
-                                        className="size-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 transition-colors"
-                                    >
-                                        <span className="material-symbols-outlined text-[22px]">search</span>
-                                    </button>
+                                    {/* Search button moved to sub-header */}
 
                                     {selectedIds.size > 0 ? (
                                         <button
@@ -302,8 +299,17 @@ export const ImportWizard: React.FC = () => {
                             <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 px-4">{currentStage.description}</p>
                         </div>
                         <div className="flex justify-between items-center">
-                            <div className="inline-flex items-center px-2 py-0.5 bg-gray-100 dark:bg-white/5 rounded text-[10px] font-bold text-gray-500 uppercase tracking-wide">
-                                {remainingContacts.length} Left
+                            <div className="flex items-center gap-2">
+                                <span className="inline-flex items-center px-2 py-0.5 bg-gray-100 dark:bg-white/5 rounded text-[10px] font-bold text-gray-500 uppercase tracking-wide">
+                                    {remainingContacts.length} Left
+                                </span>
+                                <button
+                                    onClick={() => setIsSearchVisible(true)}
+                                    className="size-7 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 transition-colors"
+                                    title="Search"
+                                >
+                                    <span className="material-symbols-outlined text-[18px]">search</span>
+                                </button>
                             </div>
                             <label className="flex items-center gap-2 text-sm text-primary font-bold cursor-pointer" onClick={toggleAll}>
                                 <div className={clsx("size-5 border-2 rounded flex items-center justify-center transition-all",

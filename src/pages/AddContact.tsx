@@ -99,14 +99,7 @@ export const AddContact: React.FC = () => {
             </header>
 
             <main className="flex-1 flex flex-col max-w-lg mx-auto w-full">
-                <div className="flex flex-col items-center justify-center my-6">
-                    <div className="relative group">
-                        <div className="size-28 rounded-full bg-surface-light dark:bg-surface-dark border-2 border-dashed border-gray-300 dark:border-white/20 flex items-center justify-center text-gray-400 dark:text-gray-500 cursor-pointer hover:border-primary transition-colors hover:text-primary">
-                            <span className="material-symbols-outlined text-4xl">add_a_photo</span>
-                        </div>
-                    </div>
-                    <p className="mt-3 text-sm font-medium text-gray-500 dark:text-gray-400">Add Photo</p>
-                </div>
+                {/* Photo upload removed per user request */}
 
                 <form className="space-y-5" onSubmit={handleSubmit}>
                     <div className="grid grid-cols-2 gap-4">
@@ -130,7 +123,6 @@ export const AddContact: React.FC = () => {
                                 onChange={handleChange}
                                 className="block w-full rounded-xl border-gray-200 dark:border-white/10 bg-surface-light dark:bg-surface-dark text-gray-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-base py-3 px-4 placeholder-gray-400"
                                 placeholder="Doe"
-                                required
                                 type="text"
                             />
                         </div>
@@ -248,11 +240,27 @@ export const AddContact: React.FC = () => {
                         </p>
                     </div>
 
-                    <div className="fixed bottom-0 left-0 w-full z-40 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-t border-gray-200 dark:border-white/5 p-4 pb-safe">
-                        <button className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-primary hover:bg-primary/90 text-black text-base font-bold shadow-[0_0_20px_rgba(70,236,19,0.3)] transition-all transform active:scale-[0.98]" type="submit">
+                    <div className="fixed bottom-0 left-0 w-full z-40 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-t border-gray-200 dark:border-white/5 p-4 pb-safe flex flex-col gap-3">
+                        <button className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-primary hover:bg-primary/90 text-black text-base font-bold shadow-[0_0_20px_rgba(242,87,87,0.3)] transition-all transform active:scale-[0.98]" type="submit">
                             <span className="material-symbols-outlined font-bold">check</span>
                             Save Contact
                         </button>
+
+                        {id && (
+                            <button
+                                type="button"
+                                onClick={async () => {
+                                    if (confirm('Are you sure you want to delete this contact?')) {
+                                        await db.contacts.delete(id);
+                                        sounds.play('delete');
+                                        navigate('/');
+                                    }
+                                }}
+                                className="w-full h-10 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 font-bold text-sm transition-colors"
+                            >
+                                Delete Contact
+                            </button>
+                        )}
                     </div>
                 </form>
             </main>
