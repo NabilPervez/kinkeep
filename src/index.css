@@ -3,6 +3,15 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* CSS HEX */
+    --steel-blue: #4f7cacff;
+    --frozen-water: #c0e0deff;
+    --jet-black: #162521ff;
+    --iron-grey: #3c474bff;
+    --soft-cyan: #9eefe5ff;
+  }
+
   body {
     @apply bg-background-light dark:bg-background-dark text-gray-900 dark:text-white font-display min-h-screen flex flex-col overflow-x-hidden;
   }
@@ -10,13 +19,14 @@
 
 /* Custom scrollbar hiding */
 .no-scrollbar::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
+
 .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .pb-safe {
-    padding-bottom: env(safe-area-inset-bottom, 20px);
+  padding-bottom: env(safe-area-inset-bottom, 20px);
 }
