@@ -13,6 +13,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     const navItems = [
         { path: '/', label: 'Home', icon: 'favorite' },
         { path: '/contacts', label: 'Contacts', icon: 'people' },
+        { path: '/planning', label: 'Planning', icon: 'calendar_month' },
         { path: '/templates', label: 'Templates', icon: 'edit_note' },
     ];
 

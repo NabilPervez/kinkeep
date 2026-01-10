@@ -208,8 +208,9 @@ export const Dashboard: React.FC = () => {
 
     return (
         <div className="flex-1 flex flex-col h-screen bg-transparent no-scrollbar overflow-y-auto">
-            <header className="sticky top-0 z-50 glass-panel border-b-0 pb-2">
-                <div className="flex items-center justify-between px-6 pt-12 pb-2">
+            {/* Header with full bleed on mobile (-mx-4 to counteract Layout padding) */}
+            <header className="sticky top-0 z-50 glass-panel border-b-0 pb-2 -mx-4 px-6 md:mx-0 md:px-6 md:rounded-2xl">
+                <div className="flex items-center justify-between pt-12 pb-2">
                     <div className="flex items-center gap-2">
                         <div className="flex items-center justify-center size-8 rounded-lg bg-primary/90 text-white font-bold shadow-lg shadow-primary/25 backdrop-blur-sm">
                             <span className="material-symbols-outlined text-[20px]">favorite</span>
@@ -225,7 +226,7 @@ export const Dashboard: React.FC = () => {
                     </Link>
                 </div>
                 {/* Horizontal Category Filter */}
-                <div className="px-6 pb-2 overflow-x-auto no-scrollbar flex gap-2">
+                <div className="pb-2 overflow-x-auto no-scrollbar flex gap-2 w-full">
                     {categoryOptions.map(c => (
                         <button
                             key={c.id}
@@ -234,7 +235,7 @@ export const Dashboard: React.FC = () => {
                                 sounds.play('pop');
                             }}
                             className={clsx(
-                                "px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wide transition-all whitespace-nowrap border backdrop-blur-md",
+                                "px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wide transition-all whitespace-nowrap border backdrop-blur-md shrink-0 flex-1 md:flex-none text-center",
                                 categoryFilter === c.id
                                     ? "bg-white text-black border-transparent shadow-lg shadow-white/10"
                                     : "bg-white/5 text-white/60 border-white/5 hover:bg-white/10 hover:text-white"
