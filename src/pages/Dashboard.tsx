@@ -41,11 +41,16 @@ export const Dashboard: React.FC = () => {
     const snoozedContacts = sortedContacts.filter(c => c.snoozedUntil && c.snoozedUntil > now && !contactedToday.includes(c));
 
     // Exclude contacted (handled) and snoozed from critical
-    const criticalContacts = sortedContacts.filter(c =>
-        (c.isBirthdayUpcoming || getNextDueDate(c) < now) &&
-        !contactedToday.includes(c) &&
-        !snoozedContacts.includes(c)
-    );
+    const criticalContacts = sortedContacts.filter(c => {
+        const due = getNextDueDate(c);
+        const isDueForToday = due < now || isToday(due);
+
+        return (
+            (c.isBirthdayUpcoming || isDueForToday) &&
+            !contactedToday.includes(c) &&
+            !snoozedContacts.includes(c)
+        );
+    });
     // Include contactedToday in upcoming, but exclude snoozed
     const upcomingContacts = sortedContacts.filter(c =>
         !criticalContacts.includes(c) &&
@@ -71,8 +76,8 @@ export const Dashboard: React.FC = () => {
 
     // Bento Grid Dashboard Implementation
     const renderBentoGrid = () => {
-        // Zone A: Focus Contact (Highest Priority)
-        const focusContact = criticalContacts[0] || upcomingContacts[0];
+        // Zone A: Focus Contact (Highest Priority - Only Today/Overdue)
+        const focusContact = criticalContacts[0];
 
         // Zone D: List Feed (Remaining Upcoming) - Now includes everyone NOT the focus contact
         const feedContacts = [...criticalContacts, ...upcomingContacts].filter(c => c.id !== focusContact?.id);
@@ -141,9 +146,12 @@ export const Dashboard: React.FC = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className="glass-card rounded-3xl p-8 flex flex-col items-center justify-center text-center text-white/60 min-h-[200px]">
-                        <span className="material-symbols-outlined text-4xl mb-2">check_circle</span>
-                        <p className="font-medium">All caught up!</p>
+                    <div className="glass-card rounded-3xl p-10 flex flex-col items-center justify-center text-center text-white min-h-[350px] animate-in zoom-in-95 duration-500">
+                        <div className="size-24 rounded-full bg-emerald-500/20 flex items-center justify-center mb-6 shadow-xl shadow-emerald-500/10 ring-1 ring-emerald-500/30">
+                            <span className="material-symbols-outlined text-5xl text-emerald-400">check</span>
+                        </div>
+                        <h2 className="text-3xl font-black text-white mb-2 tracking-tight">All Done!</h2>
+                        <p className="text-white/50 text-lg font-medium max-w-[200px]">You've completed your checklist for today.</p>
                     </div>
                 )}
 
