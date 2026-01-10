@@ -4,7 +4,7 @@ import { db } from '../db/db';
 import { sounds } from '../utils/sounds';
 import { useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
-import { DAYS_OF_WEEK } from '../constants';
+import { DAYS_OF_WEEK, CATEGORIES } from '../constants';
 import type { Contact } from '../types';
 
 export const Planning: React.FC = () => {
@@ -18,18 +18,18 @@ export const Planning: React.FC = () => {
 
     // State to track progress
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [currentStep, setCurrentStep] = useState<'frequency' | 'day'>('frequency');
     const [selectedFrequency, setSelectedFrequency] = useState<number | null>(null);
     const [selectedDay, setSelectedDay] = useState<number | null>(null);
+    const [category, setCategory] = useState<string | null>(null);
 
     const currentContact = allContacts[currentIndex];
 
     // Reset step when contact changes
     useEffect(() => {
-        setCurrentStep('frequency');
-        setSelectedFrequency(null);
-        setSelectedDay(null);
-    }, [currentIndex]);
+        setSelectedFrequency(currentContact?.frequencyDays || null); // Pre-fill if exists
+        setSelectedDay(currentContact?.preferredDayOfWeek ?? null);
+        setCategory(currentContact?.category || null);
+    }, [currentContact]);
 
     const handleSave = async () => {
         if (!currentContact) return;
@@ -39,6 +39,7 @@ export const Planning: React.FC = () => {
 
         if (selectedFrequency !== null) updates.frequencyDays = selectedFrequency;
         if (selectedDay !== null) updates.preferredDayOfWeek = selectedDay;
+        if (category) updates.category = category as Contact['category'];
 
         if (Object.keys(updates).length > 0) {
             await db.contacts.update(currentContact.id, updates);
@@ -115,66 +116,94 @@ export const Planning: React.FC = () => {
                     <p className="text-white/50 font-medium text-lg">{currentContact.lastName}</p>
                 </div>
 
-                {/* Interaction Area */}
-                <div className="w-full space-y-6">
-                    {currentStep === 'frequency' && (
-                        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
-                            <h3 className="text-center text-white/80 font-bold text-lg">How often do you want to reach out?</h3>
-                            <div className="grid grid-cols-2 gap-3">
-                                {[
-                                    { label: 'Weekly', value: 7 },
-                                    { label: 'Bi-Weekly', value: 14 },
-                                    { label: 'Monthly', value: 30 },
-                                    { label: 'Quarterly', value: 90 }
-                                ].map(opt => (
-                                    <button
-                                        key={opt.value}
-                                        onClick={() => {
-                                            sounds.play('click');
-                                            setSelectedFrequency(opt.value);
-                                            setCurrentStep('day');
-                                        }}
-                                        className="h-16 rounded-2xl bg-white/5 hover:bg-white/20 border border-white/10 text-white font-bold transition-all active:scale-95 flex items-center justify-center"
-                                    >
-                                        {opt.label}
-                                    </button>
-                                ))}
-                            </div>
+                {/* Interaction Area (Single Screen) */}
+                <div className="w-full space-y-6 pb-20">
+                    {/* 1. Category */}
+                    <div className="space-y-2">
+                        <h3 className="text-white/60 text-xs font-bold uppercase tracking-widest pl-1">Category</h3>
+                        <div className="flex flex-wrap gap-2">
+                            {CATEGORIES.map(cat => (
+                                <button
+                                    key={cat.id}
+                                    onClick={() => {
+                                        setCategory(cat.id);
+                                        sounds.play('click');
+                                    }}
+                                    className={clsx(
+                                        "px-4 py-2 rounded-xl text-sm font-bold transition-all border",
+                                        category === cat.id
+                                            ? "bg-white text-black border-transparent shadow-lg scale-105"
+                                            : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"
+                                    )}
+                                >
+                                    {cat.label}
+                                </button>
+                            ))}
                         </div>
-                    )}
+                    </div>
 
-                    {currentStep === 'day' && (
-                        <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
-                            <h3 className="text-center text-white/80 font-bold text-lg">Which day works best?</h3>
-                            <div className="grid grid-cols-4 gap-2">
-                                {DAYS_OF_WEEK.map(day => (
-                                    <button
-                                        key={day.value}
-                                        onClick={() => {
-                                            sounds.play('click');
-                                            setSelectedDay(day.value);
-                                        }}
-                                        className={clsx(
-                                            "h-12 rounded-xl text-sm font-bold transition-all border",
-                                            selectedDay === day.value
-                                                ? "bg-primary text-white border-transparent shadow-[0_0_15px_rgba(79,124,172,0.5)]"
-                                                : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"
-                                        )}
-                                    >
-                                        {day.label}
-                                    </button>
-                                ))}
-                            </div>
-
-                            <button
-                                onClick={handleSave}
-                                disabled={selectedDay === null}
-                                className="w-full h-14 mt-4 rounded-2xl bg-white text-black font-black text-lg shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none"
-                            >
-                                Confirm & Next
-                            </button>
+                    {/* 2. Frequency */}
+                    <div className="space-y-2">
+                        <h3 className="text-white/60 text-xs font-bold uppercase tracking-widest pl-1">Frequency</h3>
+                        <div className="grid grid-cols-3 gap-2">
+                            {[
+                                { label: 'Daily', value: 1 },
+                                { label: 'Weekly', value: 7 },
+                                { label: 'Bi-Weekly', value: 14 },
+                                { label: 'Monthly', value: 30 },
+                                { label: 'Quarterly', value: 90 },
+                                { label: 'Yearly', value: 365 }
+                            ].map(opt => (
+                                <button
+                                    key={opt.value}
+                                    onClick={() => {
+                                        sounds.play('click');
+                                        setSelectedFrequency(opt.value);
+                                    }}
+                                    className={clsx(
+                                        "h-10 rounded-xl text-xs font-bold transition-all border",
+                                        selectedFrequency === opt.value
+                                            ? "bg-white text-black border-transparent shadow-lg scale-105"
+                                            : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"
+                                    )}
+                                >
+                                    {opt.label}
+                                </button>
+                            ))}
                         </div>
-                    )}
+                    </div>
+
+                    {/* 3. Preferred Day */}
+                    <div className="space-y-2">
+                        <h3 className="text-white/60 text-xs font-bold uppercase tracking-widest pl-1">Preferred Day</h3>
+                        <div className="grid grid-cols-7 gap-1">
+                            {DAYS_OF_WEEK.map(day => (
+                                <button
+                                    key={day.value}
+                                    onClick={() => {
+                                        sounds.play('click');
+                                        setSelectedDay(day.value);
+                                    }}
+                                    className={clsx(
+                                        "h-10 rounded-lg text-[10px] font-bold transition-all border flex items-center justify-center",
+                                        selectedDay === day.value
+                                            ? "bg-primary text-white border-transparent shadow-lg scale-110 z-10"
+                                            : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"
+                                    )}
+                                >
+                                    {day.label[0]}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <button
+                        onClick={handleSave}
+                        disabled={selectedFrequency === null || selectedDay === null || !category}
+                        className="w-full h-14 rounded-2xl bg-white text-black font-black text-lg shadow-xl shadow-white/10 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-30 disabled:pointer-events-none mt-4"
+                    >
+                        Save & Next
+                    </button>
                 </div>
 
             </main>
