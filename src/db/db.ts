@@ -39,47 +39,14 @@ export class KinKeepDB extends Dexie {
 
     async seedTemplates() {
         await this.templates.clear();
-        await this.templates.bulkAdd([
-            {
-                "id": "1",
-                "category": "islamic",
-                "text": "Salaam brother. Jummah Mubarak. How are you?",
-                "isDefault": true
-            },
-            {
-                "id": "2",
-                "category": "friends",
-                "text": "Hey brother how are you?",
-                "isDefault": true
-            },
-            {
-                "id": "3",
-                "category": "friends",
-                "text": "Hey man - whats up?",
-                "isDefault": true
-            },
-            {
-                "id": "4",
-                "category": "birthday",
-                "text": "Happy Birthday! Wishing you a fantastic year ahead.",
-                "isDefault": true
-            },
-            {
-                "id": "5",
-                "category": "colleagues",
-                "text": "Hi {NAME}, hope you're having a productive week.",
-                "isDefault": true
-            }
-        ]);
+        // No default templates - user should create their own via the wizard
+        await this.templates.clear();
+
     }
 }
 
 export const db = new KinKeepDB();
 
 // Force re-seed on load for this update (Quick fix for the task to ensure old templates are gone)
-db.on('ready', async () => {
-    // ALWAYS re-seed for this update to ensure users get the new templates
-    // In production we might check a version flag, but for this task we want immediate effect
-    await db.templates.clear();
-    await db.seedTemplates();
-});
+// db.on('ready') block removed to prevent auto-reseeding templates
+

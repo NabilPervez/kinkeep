@@ -37,9 +37,6 @@ The application is built with a mobile-first philosophy but functions as a respo
 
 ## Unique Features & Selling Points
 
-### 🕌 Faith-Aligned Design
-KinKeep features an "Islamic" category as a primary default, reflected in the UI's emerald-themed branding (in specific modes) and potential future integrations (e.g., prayer times, as hinted in development). This positions it uniquely for users who view maintaining kinship ("Silat ar-Rahim") as a spiritual duty.
-
 ### 📅 Granular "Cadence" Control
 Unlike simple "favorites," KinKeep allows specific rhythms for every person in your life:
 *   *Daily* for closest family.
@@ -49,9 +46,3 @@ Unlike simple "favorites," KinKeep allows specific rhythms for every person in y
 
 ### 🔒 Privacy-Centric Architecture
 In an era of cloud data leaks, KinKeep operates completely offline. User contact data never leaves their device, offering peace of mind for privacy-conscious users.
-
-### ⚡ Gamified "Import Funnel"
-The Import Wizard turns the tedious task of organizing contacts into a streamlined "funnel," moving users through stages (Daily -> Weekly -> Monthly) to quickly sort hundreds of contacts without overwhelm.
-
-### 🎨 Neo-Dark Aesthetic
-The application features a modern, high-contrast "Neo-dark" design with vibrant accents (Emerald, Purple, Blue) and glassmorphism effects, offering a premium "app-like" feel even in the browser.

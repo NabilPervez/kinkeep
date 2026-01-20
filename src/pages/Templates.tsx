@@ -14,9 +14,25 @@ export const Templates: React.FC = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Simple state for creating new template (inline or modal? let's do inline for simplicity)
+    // Standard Edit/Create State
     const [isCreating, setIsCreating] = useState(false);
     const [templateToEdit, setTemplateToEdit] = useState<Template | null>(null);
     const [newTemplate, setNewTemplate] = useState<Partial<Template>>({ category: 'friends', text: '', isDefault: false });
+
+    // Wizard State
+    const [isWizardOpen, setIsWizardOpen] = useState(false);
+    const [wizardStep, setWizardStep] = useState(0);
+    const [wizardData, setWizardData] = useState<Record<string, string>>({});
+
+    const createDefaultPrompt = (categoryId: string) => {
+        switch (categoryId) {
+            case 'islamic': return "Salaam {NAME}, hope you're doing well!";
+            case 'friends': return "Hey {NAME}, what's up?";
+            case 'colleagues': return "Hi {NAME}, hope work is going well.";
+            case 'birthday': return "Happy Birthday {NAME}! Hope you have a great day.";
+            default: return "Hi {NAME}, decided to reach out!";
+        }
+    };
 
     // Reset form helper
     const resetForm = () => {
@@ -24,6 +40,49 @@ export const Templates: React.FC = () => {
         setNewTemplate({ category: 'friends', text: '' });
         setIsCreating(false);
     };
+
+    const startWizard = () => {
+        setWizardStep(0);
+        setWizardData({});
+        setIsWizardOpen(true);
+        sounds.play('click');
+    };
+
+    const handleWizardNext = async () => {
+        const currentCategory = TEMPLATE_CATEGORIES[wizardStep];
+        const currentText = wizardData[currentCategory.id] || '';
+
+        if (!currentText.trim()) {
+            alert('Please enter a template message.');
+            return;
+        }
+
+        if (wizardStep < TEMPLATE_CATEGORIES.length - 1) {
+            setWizardStep(prev => prev + 1);
+            sounds.play('click');
+        } else {
+            // Finish
+            const newTemplates: Template[] = Object.entries(wizardData).map(([catId, text]) => ({
+                id: uuidv4(),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                category: catId as any,
+                text: text,
+                isDefault: false
+            }));
+
+            // Add the last one too since state update might be laggy if we didn't update wizardData yet? 
+            // Actually better to just use the value from the input or ensure state is updated. 
+            // React state updates are scheduled.
+            // Let's rely on the fact that onChange updates `wizardData`.
+            // Wait, the current text input needs to be saved to `wizardData` BEFORE moving next or finishing.
+            // My onChange implementation will update `wizardData` directly.
+
+            await db.templates.bulkAdd(newTemplates);
+            sounds.play('success');
+            setIsWizardOpen(false);
+        }
+    };
+
 
     const templates = useLiveQuery(() => db.templates.toArray()) || [];
 
@@ -150,6 +209,14 @@ export const Templates: React.FC = () => {
                             <span className="material-symbols-outlined text-[20px]">upload</span>
                         </button>
                         <button
+                            onClick={startWizard}
+                            className="flex items-center justify-center gap-2 px-4 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all active:scale-95"
+                            title="Personalize Templates Wizard"
+                        >
+                            <span className="material-symbols-outlined text-[20px]">auto_fix_high</span>
+                            <span className="text-sm font-bold hidden sm:inline">Wizard</span>
+                        </button>
+                        <button
                             onClick={() => {
                                 setIsCreating(true);
                                 sounds.play('click');
@@ -255,6 +322,90 @@ export const Templates: React.FC = () => {
                                     className="flex-1 h-12 rounded-xl bg-primary text-white font-bold shadow-lg shadow-primary/30 hover:bg-primary-dark transition-all"
                                 >
                                     Save
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Wizard Modal */}
+            {isWizardOpen && (
+                <div className="fixed inset-0 z-[1001] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+                    <div className="glass-panel w-full max-w-2xl rounded-3xl p-8 shadow-2xl animate-in zoom-in-95 fade-in-0 duration-300 !bg-white/95 dark:!bg-[#1C1C1E]/95 relative overflow-hidden">
+
+                        {/* Progress Bar */}
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gray-100 dark:bg-white/5">
+                            <div
+                                className="h-full bg-primary transition-all duration-500 ease-out"
+                                style={{ width: `${((wizardStep + 1) / TEMPLATE_CATEGORIES.length) * 100}%` }}
+                            />
+                        </div>
+
+                        <div className="mb-8 mt-2">
+                            <div className="flex items-center justify-between mb-4">
+                                <span className="text-xs font-bold uppercase tracking-wider text-primary">
+                                    Step {wizardStep + 1} of {TEMPLATE_CATEGORIES.length}
+                                </span>
+                                <button
+                                    onClick={() => setIsWizardOpen(false)}
+                                    className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+                                >
+                                    <span className="material-symbols-outlined">close</span>
+                                </button>
+                            </div>
+                            <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-2">
+                                {TEMPLATE_CATEGORIES[wizardStep].label}
+                            </h2>
+                            <p className="text-gray-500 dark:text-gray-400 text-lg">
+                                How would you reach out to your {TEMPLATE_CATEGORIES[wizardStep].label.toLowerCase()} contacts?
+                            </p>
+                        </div>
+
+                        <div className="space-y-6">
+                            <div className="relative">
+                                <textarea
+                                    className="w-full rounded-2xl border-2 border-transparent bg-gray-50 dark:bg-white/5 p-6 h-48 text-xl leading-relaxed text-gray-900 dark:text-white outline-none focus:border-primary/50 focus:bg-white dark:focus:bg-white/10 transition-all resize-none shadow-inner"
+                                    placeholder={`e.g., Hey {NAME}, just thinking of you! How have you been?`}
+                                    value={wizardData[TEMPLATE_CATEGORIES[wizardStep].id] || ''}
+                                    onChange={e => setWizardData({ ...wizardData, [TEMPLATE_CATEGORIES[wizardStep].id]: e.target.value })}
+                                    autoFocus
+                                />
+                                <div className="absolute bottom-4 right-4 flex gap-2">
+                                    <button
+                                        onClick={() => setWizardData({ ...wizardData, [TEMPLATE_CATEGORIES[wizardStep].id]: createDefaultPrompt(TEMPLATE_CATEGORIES[wizardStep].id) })}
+                                        className="px-3 py-1.5 rounded-lg bg-gray-200 dark:bg-gray-700 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                                        title="Use AI Suggestion (Simulation)"
+                                    >
+                                        Use Suggestion
+                                    </button>
+                                </div>
+                            </div>
+
+                            <p className="text-sm text-gray-400 font-medium flex items-center gap-2">
+                                <span className="material-symbols-outlined text-[18px]">info</span>
+                                Pro tip: Use <code>{`{NAME}`}</code> to automatically insert the contact's name.
+                            </p>
+
+                            <div className="flex gap-4 pt-4">
+                                <button
+                                    onClick={() => {
+                                        if (wizardStep > 0) {
+                                            setWizardStep(prev => prev - 1);
+                                            sounds.play('click');
+                                        }
+                                    }}
+                                    disabled={wizardStep === 0}
+                                    className="px-8 h-14 rounded-2xl font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Back
+                                </button>
+                                <button
+                                    onClick={handleWizardNext}
+                                    className="flex-1 h-14 rounded-2xl bg-primary text-white font-bold text-lg shadow-xl shadow-primary/30 hover:bg-primary-dark hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                                >
+                                    {wizardStep === TEMPLATE_CATEGORIES.length - 1 ? 'Finish & Save' : 'Next Category'}
+                                    <span className="material-symbols-outlined">arrow_forward</span>
                                 </button>
                             </div>
                         </div>
