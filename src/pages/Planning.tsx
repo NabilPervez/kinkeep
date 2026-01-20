@@ -78,24 +78,24 @@ export const Planning: React.FC = () => {
     }
 
     return (
-        <div className="flex-1 flex flex-col h-screen bg-transparent p-4 relative overflow-hidden">
+        <div className="flex-1 flex flex-col min-h-full bg-transparent relative overflow-hidden">
             {/* Background Decor */}
             <div className="fixed inset-0 pointer-events-none z-0">
                 <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-emerald-500/20 blur-[100px] rounded-full mix-blend-screen animate-blob" />
                 <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-500/20 blur-[100px] rounded-full mix-blend-screen animate-blob animation-delay-2000" />
             </div>
 
-            <header className="relative z-10 flex items-center justify-between p-4">
-                <button onClick={() => navigate('/')} className="size-10 rounded-full bg-white/10 flex items-center justify-center text-white">
+            <header className="sticky top-0 z-50 flex items-center justify-between px-4 pt-12 pb-2">
+                <button onClick={() => navigate('/')} className="size-10 rounded-full bg-white/10 flex items-center justify-center text-white backdrop-blur-md">
                     <span className="material-symbols-outlined">close</span>
                 </button>
-                <div className="text-white/60 text-xs font-bold uppercase tracking-wider">
+                <div className="text-white/60 text-xs font-bold uppercase tracking-wider backdrop-blur-md px-2 py-1 rounded-full bg-black/10">
                     {currentIndex + 1} / {allContacts.length}
                 </div>
                 <div className="size-10" />
             </header>
 
-            <main className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-md mx-auto w-full">
+            <main className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-md mx-auto w-full px-4 pt-4">
 
                 {/* Contact Card */}
                 <div className="glass-card w-full p-8 rounded-[40px] flex flex-col items-center text-center mb-8 animate-in zoom-in-95 duration-500">

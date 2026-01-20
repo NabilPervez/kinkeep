@@ -124,7 +124,7 @@ export const Contacts: React.FC = () => {
     return (
         <div className="flex-1 flex flex-col h-screen bg-transparent relative">
             <header className="sticky top-0 z-40 glass-panel border-b-0 pb-2">
-                <div className="flex items-center justify-between px-4 pt-4 pb-2">
+                <div className="flex items-center justify-between px-4 pt-12 pb-2">
                     <h1 className="text-2xl font-black leading-tight tracking-tight">Contacts</h1>
                     <div className="flex gap-2 relative">
                         {/* Export Button with Dropdown */}

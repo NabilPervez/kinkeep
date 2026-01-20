@@ -40,7 +40,7 @@ export const Settings: React.FC = () => {
     return (
         <div className="flex-1 flex flex-col h-screen bg-transparent">
             <header className="sticky top-0 z-50 glass-panel border-b-0 pb-2">
-                <div className="flex items-center justify-between px-4 pt-4 pb-2">
+                <div className="flex items-center justify-between px-4 pt-12 pb-2">
                     <button onClick={() => navigate(-1)} className="flex items-center justify-center size-10 -ml-2 rounded-full text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
                         <span className="material-symbols-outlined">arrow_back</span>
                     </button>
