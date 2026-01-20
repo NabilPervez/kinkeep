@@ -208,8 +208,8 @@ export const Dashboard: React.FC = () => {
 
     return (
         <div className="flex-1 flex flex-col h-screen bg-transparent no-scrollbar overflow-y-auto">
-            {/* Header with full bleed on mobile (-mx-4 to counteract Layout padding) */}
-            <header className="sticky top-0 z-50 glass-panel border-b-0 pb-2 -mx-4 px-6 md:mx-0 md:px-6 md:rounded-2xl">
+            {/* Header with full bleed on mobile (-mx-4 to counteract Layout padding) -> Now standard */}
+            <header className="sticky top-0 z-50 glass-panel border-b-0 pb-2 px-4">
                 <div className="flex items-center justify-between pt-12 pb-2">
                     <div className="flex items-center gap-2">
                         <div className="flex items-center justify-center size-8 rounded-lg bg-primary/90 text-white font-bold shadow-lg shadow-primary/25 backdrop-blur-sm">
@@ -248,7 +248,7 @@ export const Dashboard: React.FC = () => {
             </header>
 
             {/* Main Content Area - Bento Grid */}
-            <main>
+            <main className="px-4">
                 {!hasData ? (
                     <div className="mt-20 flex flex-col items-center justify-center p-6 text-center opacity-60">
                         <span className="material-symbols-outlined text-6xl mb-4 text-white/20">checklist</span>

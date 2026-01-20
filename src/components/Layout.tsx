@@ -58,7 +58,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 })}
             </nav>
 
-            <div className="flex-1 overflow-y-auto no-scrollbar scroll-smooth relative z-10 p-4">
+            <div className="flex-1 overflow-y-auto no-scrollbar scroll-smooth relative z-10">
                 {children}
             </div>
 

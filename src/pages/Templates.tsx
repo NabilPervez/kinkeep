@@ -187,8 +187,8 @@ export const Templates: React.FC = () => {
                 className="hidden"
                 accept=".json"
             />
-            <header className="sticky top-0 z-50 glass-panel border-b-0 pb-2">
-                <div className="flex items-center justify-between px-6 pt-12 pb-2">
+            <header className="sticky top-0 z-50 glass-panel border-b-0 pb-2 px-4">
+                <div className="flex items-center justify-between pt-12 pb-2">
                     <button onClick={() => navigate(-1)} className="flex items-center justify-center size-10 -ml-2 rounded-full text-gray-900 dark:text-white hover:bg-white/10 transition-colors">
                         <span className="material-symbols-outlined">arrow_back</span>
                     </button>
@@ -229,7 +229,7 @@ export const Templates: React.FC = () => {
                 </div>
 
                 {/* Filter Chips */}
-                <div className="px-6 pb-2 overflow-x-auto no-scrollbar flex gap-2">
+                <div className="pb-2 overflow-x-auto no-scrollbar flex gap-2 w-full">
                     {filterOptions.map(cat => (
                         <button
                             key={cat.id}
@@ -238,9 +238,9 @@ export const Templates: React.FC = () => {
                                 sounds.play('pop');
                             }}
                             className={clsx(
-                                "px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all whitespace-nowrap",
+                                "px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wide transition-all whitespace-nowrap border backdrop-blur-md shrink-0",
                                 filter === cat.id
-                                    ? "bg-primary text-white shadow-lg shadow-primary/25"
+                                    ? "bg-primary text-white shadow-lg shadow-primary/25 border-transparent"
                                     : "glass-input text-gray-500 hover:bg-white/20 border-transparent dark:text-gray-300"
                             )}
                         >
