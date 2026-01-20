@@ -52,12 +52,9 @@ export const Planning: React.FC = () => {
     };
 
     const nextContact = () => {
-        if (currentIndex < allContacts.length - 1) {
-            setCurrentIndex(prev => prev + 1);
-        } else {
-            // Finished
-            navigate('/');
-        }
+        // Just move to next index. If it goes out of bounds, 
+        // currentContact becomes undefined and the 'All Done' screen renders.
+        setCurrentIndex(prev => prev + 1);
     };
 
     if (!allContacts.length) return null;

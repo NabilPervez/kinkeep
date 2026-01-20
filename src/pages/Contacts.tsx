@@ -160,6 +160,10 @@ export const Contacts: React.FC = () => {
                             <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setShowExportMenu(false)}></div>
                         )}
 
+                        <Link to="/planning" className="flex items-center justify-center size-10 rounded-full glass-input hover:bg-white/20 text-gray-900 dark:text-white transition-all active:scale-95 shadow-sm" title="Planning Mode">
+                            <span className="material-symbols-outlined font-bold">calendar_month</span>
+                        </Link>
+
                         <Link to="/import" className="flex items-center justify-center size-10 rounded-full glass-input hover:bg-white/20 text-gray-900 dark:text-white transition-all active:scale-95 shadow-sm">
                             <span className="material-symbols-outlined font-bold">upload_file</span>
                         </Link>
