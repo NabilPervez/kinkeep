@@ -4,7 +4,7 @@ import { db } from '../db/db';
 import { sounds } from '../utils/sounds';
 import { useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
-import { DAYS_OF_WEEK, CATEGORIES } from '../constants';
+import { DAYS_OF_WEEK, CATEGORIES, FREQUENCIES } from '../constants';
 import type { Contact } from '../types';
 
 export const Planning: React.FC = () => {
@@ -129,7 +129,7 @@ export const Planning: React.FC = () => {
                                     className={clsx(
                                         "px-4 py-2 rounded-xl text-sm font-bold transition-all border",
                                         category === cat.id
-                                            ? "bg-white text-black border-transparent shadow-lg scale-105"
+                                            ? clsx(cat.colorClass, "scale-105 shadow-xl")
                                             : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"
                                     )}
                                 >
@@ -143,14 +143,7 @@ export const Planning: React.FC = () => {
                     <div className="space-y-2">
                         <h3 className="text-white/60 text-xs font-bold uppercase tracking-widest pl-1">Frequency</h3>
                         <div className="grid grid-cols-3 gap-2">
-                            {[
-                                { label: 'Daily', value: 1 },
-                                { label: 'Weekly', value: 7 },
-                                { label: 'Bi-Weekly', value: 14 },
-                                { label: 'Monthly', value: 30 },
-                                { label: 'Quarterly', value: 90 },
-                                { label: 'Yearly', value: 365 }
-                            ].map(opt => (
+                            {FREQUENCIES.map(opt => (
                                 <button
                                     key={opt.value}
                                     onClick={() => {
@@ -160,7 +153,7 @@ export const Planning: React.FC = () => {
                                     className={clsx(
                                         "h-10 rounded-xl text-xs font-bold transition-all border",
                                         selectedFrequency === opt.value
-                                            ? "bg-white text-black border-transparent shadow-lg scale-105"
+                                            ? clsx(opt.colorClass, "scale-105 shadow-xl")
                                             : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"
                                     )}
                                 >
@@ -184,7 +177,7 @@ export const Planning: React.FC = () => {
                                     className={clsx(
                                         "h-10 rounded-lg text-[10px] font-bold transition-all border flex items-center justify-center",
                                         selectedDay === day.value
-                                            ? "bg-primary text-white border-transparent shadow-lg scale-110 z-10"
+                                            ? clsx(day.colorClass, "scale-110 z-10 shadow-xl")
                                             : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"
                                     )}
                                 >

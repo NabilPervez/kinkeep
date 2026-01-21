@@ -92,7 +92,7 @@ export const Contacts: React.FC = () => {
         const freq = FREQUENCIES.find(f => f.value === days);
         return {
             label: freq?.label ?? 'Unknown',
-            color: freq?.colorClass ?? 'bg-gray-100 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300'
+            color: freq?.colorClass ?? 'bg-neutral-950/60 text-neutral-400 border border-neutral-700/30 backdrop-blur-md'
         };
     };
 
@@ -101,18 +101,18 @@ export const Contacts: React.FC = () => {
         const dayObj = DAYS_OF_WEEK.find(d => d.value === day);
         return {
             label: dayObj?.label ?? '?',
-            color: dayObj?.colorClass ?? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300'
+            color: dayObj?.colorClass ?? 'bg-neutral-950/60 text-neutral-400 border border-neutral-700/30 backdrop-blur-md'
         };
     };
 
     const getCategoryStyle = (catId?: string) => {
         const cat = CATEGORIES.find(c => c.id === catId);
-        return cat?.colorClass ?? 'bg-gray-100 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300';
+        return cat?.colorClass ?? 'bg-neutral-950/60 text-neutral-400 border border-neutral-700/30 backdrop-blur-md';
     };
 
     const getCategoryBadgeColor = (catId?: string) => {
         const cat = CATEGORIES.find(c => c.id === catId);
-        return cat?.badgeColor ?? 'bg-gray-400';
+        return cat?.badgeColor ?? 'bg-neutral-500';
     };
 
     const handleExport = (type: 'csv' | 'vcf') => {
@@ -125,13 +125,13 @@ export const Contacts: React.FC = () => {
         <div className="flex-1 flex flex-col h-screen bg-transparent relative">
             <header className="sticky top-0 z-40 glass-panel border-b-0 pb-2">
                 <div className="flex items-center justify-between px-4 pt-12 pb-2">
-                    <h1 className="text-2xl font-black leading-tight tracking-tight">Contacts</h1>
+                    <h1 className="text-2xl font-black leading-tight tracking-tight text-white">Contacts</h1>
                     <div className="flex gap-2 relative">
                         {/* Export Button with Dropdown */}
                         <div className="relative">
                             <button
                                 onClick={() => setShowExportMenu(!showExportMenu)}
-                                className="flex items-center justify-center size-10 rounded-full glass-input hover:bg-white/20 text-gray-900 dark:text-white transition-all active:scale-95 shadow-sm"
+                                className="flex items-center justify-center size-10 rounded-full glass-input hover:bg-white/20 text-white transition-all active:scale-95 shadow-sm"
                             >
                                 <span className="material-symbols-outlined font-bold">download</span>
                             </button>
@@ -140,14 +140,14 @@ export const Contacts: React.FC = () => {
                                 <div className="absolute top-full right-0 mt-2 w-32 glass-panel rounded-xl shadow-xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
                                     <button
                                         onClick={() => handleExport('csv')}
-                                        className="w-full px-4 py-3 text-left text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-white/10 flex items-center gap-2"
+                                        className="w-full px-4 py-3 text-left text-sm font-bold text-gray-200 hover:bg-white/10 flex items-center gap-2"
                                     >
                                         <span className="material-symbols-outlined text-[18px]">csv</span> CSV
                                     </button>
                                     <div className="h-px bg-white/10"></div>
                                     <button
                                         onClick={() => handleExport('vcf')}
-                                        className="w-full px-4 py-3 text-left text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-white/10 flex items-center gap-2"
+                                        className="w-full px-4 py-3 text-left text-sm font-bold text-gray-200 hover:bg-white/10 flex items-center gap-2"
                                     >
                                         <span className="material-symbols-outlined text-[18px]">contact_page</span> VCF
                                     </button>
@@ -160,11 +160,11 @@ export const Contacts: React.FC = () => {
                             <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setShowExportMenu(false)}></div>
                         )}
 
-                        <Link to="/planning" className="flex items-center justify-center size-10 rounded-full glass-input hover:bg-white/20 text-gray-900 dark:text-white transition-all active:scale-95 shadow-sm" title="Planning Mode">
+                        <Link to="/planning" className="flex items-center justify-center size-10 rounded-full glass-input hover:bg-white/20 text-white transition-all active:scale-95 shadow-sm" title="Planning Mode">
                             <span className="material-symbols-outlined font-bold">calendar_month</span>
                         </Link>
 
-                        <Link to="/import" className="flex items-center justify-center size-10 rounded-full glass-input hover:bg-white/20 text-gray-900 dark:text-white transition-all active:scale-95 shadow-sm">
+                        <Link to="/import" className="flex items-center justify-center size-10 rounded-full glass-input hover:bg-white/20 text-white transition-all active:scale-95 shadow-sm">
                             <span className="material-symbols-outlined font-bold">upload_file</span>
                         </Link>
                     </div>
@@ -173,11 +173,11 @@ export const Contacts: React.FC = () => {
                 {/* Search & Filter Bar */}
                 <div className="px-4 pb-2 space-y-2">
                     <div className="relative">
-                        <span className="material-symbols-outlined absolute left-3 top-2.5 text-gray-500">search</span>
+                        <span className="material-symbols-outlined absolute left-3 top-2.5 text-white/50">search</span>
                         <input
                             type="text"
                             placeholder="Search contacts..."
-                            className="w-full pl-10 pr-4 py-2.5 rounded-xl glass-input focus:ring-0 text-sm font-medium transition-all placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                            className="w-full pl-10 pr-4 py-2.5 rounded-xl glass-input focus:ring-0 text-white text-sm font-medium transition-all placeholder:text-white/40"
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                         />
@@ -187,16 +187,16 @@ export const Contacts: React.FC = () => {
                         <select
                             value={filterCategory}
                             onChange={e => setFilterCategory(e.target.value)}
-                            className="px-3 py-1.5 rounded-lg glass-input text-xs font-bold text-gray-600 dark:text-gray-300 whitespace-nowrap"
+                            className="px-3 py-1.5 rounded-lg glass-input text-xs font-bold text-white/80 whitespace-nowrap bg-black/50 border-none outline-none"
                         >
-                            {categoryOptions.map(o => <option key={o.val} value={o.val} className="text-black dark:text-white bg-white dark:bg-gray-800">{o.label}</option>)}
+                            {categoryOptions.map(o => <option key={o.val} value={o.val} className="text-white bg-neutral-900">{o.label}</option>)}
                         </select>
                         <select
                             value={filterFrequency}
                             onChange={e => setFilterFrequency(e.target.value)}
-                            className="px-3 py-1.5 rounded-lg glass-input text-xs font-bold text-gray-600 dark:text-gray-300 whitespace-nowrap"
+                            className="px-3 py-1.5 rounded-lg glass-input text-xs font-bold text-white/80 whitespace-nowrap bg-black/50 border-none outline-none"
                         >
-                            {frequencyOptions.map(o => <option key={o.val} value={o.val} className="text-black dark:text-white bg-white dark:bg-gray-800">{o.label}</option>)}
+                            {frequencyOptions.map(o => <option key={o.val} value={o.val} className="text-white bg-neutral-900">{o.label}</option>)}
                         </select>
                     </div>
                 </div>

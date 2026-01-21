@@ -230,23 +230,26 @@ export const Templates: React.FC = () => {
 
                 {/* Filter Chips */}
                 <div className="pb-2 overflow-x-auto no-scrollbar flex gap-2 w-full">
-                    {filterOptions.map(cat => (
-                        <button
-                            key={cat.id}
-                            onClick={() => {
-                                setFilter(cat.id);
-                                sounds.play('pop');
-                            }}
-                            className={clsx(
-                                "px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wide transition-all whitespace-nowrap border backdrop-blur-md shrink-0",
-                                filter === cat.id
-                                    ? "bg-primary text-white shadow-lg shadow-primary/25 border-transparent"
-                                    : "glass-input text-gray-500 hover:bg-white/20 border-transparent dark:text-gray-300"
-                            )}
-                        >
-                            {cat.label}
-                        </button>
-                    ))}
+                    {filterOptions.map(cat => {
+                        const styleClass = 'colorClass' in cat ? (cat as any).colorClass : "bg-primary text-white shadow-lg shadow-primary/25 border-transparent";
+                        return (
+                            <button
+                                key={cat.id}
+                                onClick={() => {
+                                    setFilter(cat.id);
+                                    sounds.play('pop');
+                                }}
+                                className={clsx(
+                                    "px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wide transition-all whitespace-nowrap border backdrop-blur-md shrink-0",
+                                    filter === cat.id
+                                        ? styleClass
+                                        : "glass-input text-gray-500 hover:bg-white/20 border-transparent dark:text-gray-300"
+                                )}
+                            >
+                                {cat.label}
+                            </button>
+                        )
+                    })}
                 </div>
             </header>
 
@@ -257,9 +260,14 @@ export const Templates: React.FC = () => {
                             "{template.text}"
                         </p>
                         <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 bg-gray-100/50 dark:bg-white/10 px-2 py-1 rounded-md backdrop-blur-sm">
-                                {TEMPLATE_CATEGORIES.find(c => c.id === template.category)?.label || template.category}
-                            </span>
+                            {(() => {
+                                const catObj = TEMPLATE_CATEGORIES.find(c => c.id === template.category);
+                                return (
+                                    <span className={clsx("text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md", catObj?.colorClass || "bg-neutral-950/60 text-neutral-400 border border-neutral-600/30")}>
+                                        {catObj?.label || template.category}
+                                    </span>
+                                );
+                            })()}
                             <div className="flex gap-2">
                                 <button
                                     onClick={(e) => handleEditClick(template, e)}
@@ -296,7 +304,7 @@ export const Templates: React.FC = () => {
                                     onChange={e => setNewTemplate({ ...newTemplate, category: e.target.value as any })}
                                 >
                                     {TEMPLATE_CATEGORIES.map(cat => (
-                                        <option key={cat.id} value={cat.id} className="text-black dark:text-white bg-white dark:bg-gray-800">{cat.label}</option>
+                                        <option key={cat.id} value={cat.id} className="text-white bg-neutral-900">{cat.label}</option>
                                     ))}
                                 </select>
                             </div>

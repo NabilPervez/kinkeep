@@ -111,6 +111,14 @@ export const Dashboard: React.FC = () => {
                                     </span>
                                     Focus
                                 </span>
+                                {(() => {
+                                    const catObj = CATEGORIES.find(cat => cat.id === focusContact.category) || CATEGORIES.find(cat => cat.id === 'other');
+                                    return (
+                                        <span className={clsx("text-[10px] font-bold px-2 py-0.5 rounded shadow-sm", catObj?.colorClass)}>
+                                            {catObj?.label || focusContact.category || 'Other'}
+                                        </span>
+                                    );
+                                })()}
                                 <span className="text-white/60 text-xs font-semibold">{formatStatus(focusContact)}</span>
                             </div>
 
@@ -229,23 +237,27 @@ export const Dashboard: React.FC = () => {
                 </div>
                 {/* Horizontal Category Filter */}
                 <div className="pb-2 overflow-x-auto no-scrollbar flex gap-2 w-full">
-                    {categoryOptions.map(c => (
-                        <button
-                            key={c.id}
-                            onClick={() => {
-                                setCategoryFilter(c.id);
-                                sounds.play('pop');
-                            }}
-                            className={clsx(
-                                "px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wide transition-all whitespace-nowrap border backdrop-blur-md shrink-0 flex-1 md:flex-none text-center",
-                                categoryFilter === c.id
-                                    ? "bg-white text-black border-transparent shadow-lg shadow-white/10"
-                                    : "bg-white/5 text-white/60 border-white/5 hover:bg-white/10 hover:text-white"
-                            )}
-                        >
-                            {c.label}
-                        </button>
-                    ))}
+                    {categoryOptions.map(c => {
+                        const styleClass = 'colorClass' in c ? (c as any).colorClass : "bg-white text-black border-transparent shadow-lg shadow-white/10";
+                        const isActive = categoryFilter === c.id;
+                        return (
+                            <button
+                                key={c.id}
+                                onClick={() => {
+                                    setCategoryFilter(c.id);
+                                    sounds.play('pop');
+                                }}
+                                className={clsx(
+                                    "px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wide transition-all whitespace-nowrap border backdrop-blur-md shrink-0 flex-1 md:flex-none text-center",
+                                    isActive
+                                        ? styleClass
+                                        : "bg-white/5 text-white/60 border-white/5 hover:bg-white/10 hover:text-white"
+                                )}
+                            >
+                                {c.label}
+                            </button>
+                        )
+                    })}
                 </div>
             </header>
 

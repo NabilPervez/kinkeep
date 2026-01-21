@@ -154,7 +154,7 @@ export const AddContact: React.FC = () => {
                                     className={clsx(
                                         "py-2.5 rounded-xl text-sm font-bold capitalize transition-all border",
                                         formData.category === cat.id
-                                            ? "bg-black dark:bg-white text-white dark:text-black border-transparent shadow"
+                                            ? clsx(cat.colorClass, "scale-105 shadow-md border-transparent")
                                             : "glass-input border-gray-200 dark:border-white/10 text-gray-500 hover:bg-white/10"
                                     )}
                                 >
@@ -194,7 +194,7 @@ export const AddContact: React.FC = () => {
                             className="w-full h-12 rounded-xl border border-gray-200 dark:border-white/10 glass-input px-4 font-medium appearance-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
                         >
                             {FREQUENCIES.map(f => (
-                                <option key={f.value} value={f.value} className="text-black dark:text-white bg-white dark:bg-gray-800">{f.label}</option>
+                                <option key={f.value} value={f.value} className="text-white bg-neutral-900">{f.label}</option>
                             ))}
                         </select>
                     </div>
@@ -219,7 +219,7 @@ export const AddContact: React.FC = () => {
                                     className={clsx(
                                         "h-10 rounded-lg text-xs font-bold transition-all border",
                                         formData.preferredDayOfWeek === day.value.toString()
-                                            ? "bg-black dark:bg-white text-white dark:text-black border-transparent shadow-md"
+                                            ? clsx(day.colorClass, "scale-105 shadow-md border-transparent")
                                             : "glass-input border-gray-200 dark:border-white/10 text-gray-500 hover:bg-white/10"
                                     )}
                                 >
