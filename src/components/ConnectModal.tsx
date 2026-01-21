@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/db';
 import clsx from 'clsx';
 import { getDaysUntilBirthday } from '../utils/sorting';
+import { TEMPLATE_CATEGORIES } from '../constants';
 
 interface ConnectModalProps {
     contactId: string | null;
@@ -185,17 +186,17 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
                         )}
                         <div className="relative z-10">
                             <div className="flex items-center justify-between mb-2">
-                                <span className={clsx(
-                                    "text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-md",
-                                    t.category === 'birthday' && "bg-warning/20 text-warning dark:bg-warning/10 dark:text-warning",
-                                    t.category === 'friends' && "bg-secondary-100 text-secondary-900 dark:bg-secondary-500/10 dark:text-secondary-300",
-                                    t.category === 'islamic' && "bg-success/10 text-success dark:bg-success/20 dark:text-success",
-                                    t.category === 'colleagues' && "bg-primary-100 text-primary-900 dark:bg-primary-500/10 dark:text-primary-300",
-                                    t.category === 'network' && "bg-neutral-100 text-neutral-900 dark:bg-neutral-700/30 dark:text-neutral-300",
-                                    t.category === 'other' && "bg-neutral-100 text-neutral-900 dark:bg-neutral-700/20 dark:text-neutral-400"
-                                )}>
-                                    {t.category}
-                                </span>
+                                {(() => {
+                                    const catObj = TEMPLATE_CATEGORIES.find(cat => cat.id === t.category) || TEMPLATE_CATEGORIES.find(cat => cat.id === 'other');
+                                    return (
+                                        <span className={clsx(
+                                            "text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-md",
+                                            catObj?.colorClass
+                                        )}>
+                                            {t.category}
+                                        </span>
+                                    );
+                                })()}
                                 {selectedTemplateId === t.id && (
                                     <span className="material-symbols-outlined text-primary text-xl animate-in zoom-in spin-in-180 duration-300">check_circle</span>
                                 )}

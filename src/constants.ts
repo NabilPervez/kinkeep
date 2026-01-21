@@ -3,32 +3,32 @@ export const CATEGORIES = [
     {
         id: 'islamic',
         label: 'Islamic',
-        colorClass: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300',
-        badgeColor: 'bg-emerald-600'
+        colorClass: 'bg-emerald-950/60 text-emerald-400 border border-emerald-500/30 backdrop-blur-md shadow-[0_0_10px_rgba(16,185,129,0.2)]',
+        badgeColor: 'bg-emerald-500'
     },
     {
         id: 'friends',
         label: 'Friends',
-        colorClass: 'bg-secondary-100 text-secondary-900 dark:bg-secondary-500/20 dark:text-secondary-100',
-        badgeColor: 'bg-secondary-500'
+        colorClass: 'bg-teal-950/60 text-teal-400 border border-teal-500/30 backdrop-blur-md shadow-[0_0_10px_rgba(45,212,191,0.2)]',
+        badgeColor: 'bg-teal-500'
     },
     {
         id: 'colleagues',
         label: 'Colleagues',
-        colorClass: 'bg-primary-100 text-primary-900 dark:bg-primary-500/20 dark:text-primary-100',
-        badgeColor: 'bg-primary-500'
+        colorClass: 'bg-cyan-950/60 text-cyan-400 border border-cyan-500/30 backdrop-blur-md shadow-[0_0_10px_rgba(34,211,238,0.2)]',
+        badgeColor: 'bg-cyan-500'
     },
     {
         id: 'network',
         label: 'Network',
-        colorClass: 'bg-neutral-100 text-neutral-900 dark:bg-neutral-500/20 dark:text-neutral-100',
-        badgeColor: 'bg-neutral-500'
+        colorClass: 'bg-slate-900/60 text-slate-300 border border-slate-600/30 backdrop-blur-md',
+        badgeColor: 'bg-slate-500'
     },
     {
         id: 'other',
         label: 'Other',
-        colorClass: 'bg-neutral-100 text-neutral-900 dark:bg-neutral-500/20 dark:text-neutral-100',
-        badgeColor: 'bg-neutral-400'
+        colorClass: 'bg-zinc-900/60 text-zinc-400 border border-zinc-700/30 backdrop-blur-md',
+        badgeColor: 'bg-zinc-500'
     }
 ] as const;
 
@@ -37,8 +37,8 @@ export const TEMPLATE_CATEGORIES = [
     {
         id: 'birthday',
         label: 'Birthday',
-        colorClass: 'bg-warning/20 text-warning dark:bg-warning/10 dark:text-warning',
-        badgeColor: 'bg-warning'
+        colorClass: 'bg-fuchsia-950/60 text-fuchsia-400 border border-fuchsia-500/30 backdrop-blur-md shadow-[0_0_10px_rgba(232,121,249,0.2)]',
+        badgeColor: 'bg-fuchsia-500'
     }
 ] as const;
 

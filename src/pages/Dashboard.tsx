@@ -180,12 +180,14 @@ export const Dashboard: React.FC = () => {
                                     <div className="flex-1 min-w-0">
                                         <h4 className="text-white font-bold truncate">{c.firstName} {c.lastName}</h4>
                                         <div className="flex items-center gap-2 mt-0.5">
-                                            <span className={clsx("text-[10px] font-bold px-1.5 py-0.5 rounded text-black/80",
-                                                (c.category as string) === 'islamic' ? 'bg-emerald-400' :
-                                                    (c.category as string) === 'family' ? 'bg-indigo-400' : 'bg-white/80'
-                                            )}>
-                                                {c.category || 'Other'}
-                                            </span>
+                                            {(() => {
+                                                const catObj = CATEGORIES.find(cat => cat.id === c.category) || CATEGORIES.find(cat => cat.id === 'other');
+                                                return (
+                                                    <span className={clsx("text-[10px] font-bold px-2 py-0.5 rounded shadow-sm", catObj?.colorClass)}>
+                                                        {catObj?.label || c.category || 'Other'}
+                                                    </span>
+                                                );
+                                            })()}
                                         </div>
                                     </div>
                                     <button className="size-8 rounded-full bg-white/5 hover:bg-primary text-white/60 hover:text-white flex items-center justify-center transition-colors">
