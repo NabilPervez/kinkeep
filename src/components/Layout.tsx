@@ -17,13 +17,13 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     ];
 
     return (
-        <div className="h-[100dvh] w-full flex flex-col md:flex-row max-w-lg md:max-w-none mx-auto shadow-2xl relative overflow-hidden bg-gray-50 dark:bg-[#0f1115]">
+        <div className="h-[100dvh] w-full flex flex-col md:flex-row max-w-lg md:max-w-none mx-auto shadow-2xl relative overflow-hidden bg-neutral-100 dark:bg-neutral-900">
 
             {/* Aurora Background Layer */}
             <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
-                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-400/30 dark:bg-purple-900/40 rounded-full blur-[80px] animate-blob" />
-                <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-400/30 dark:bg-blue-900/40 rounded-full blur-[80px] animate-blob animation-delay-2000" />
-                <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[50%] bg-emerald-400/30 dark:bg-emerald-900/40 rounded-full blur-[80px] animate-blob animation-delay-4000" />
+                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary-500/20 dark:bg-primary-900/30 rounded-full blur-[80px] animate-blob" />
+                <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-secondary-500/20 dark:bg-secondary-900/30 rounded-full blur-[80px] animate-blob animation-delay-2000" />
+                <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[50%] bg-primary-700/20 dark:bg-neutral-500/30 rounded-full blur-[80px] animate-blob animation-delay-4000" />
             </div>
 
             {/* Desktop Navigation Rail */}

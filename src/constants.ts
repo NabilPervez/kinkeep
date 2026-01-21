@@ -3,32 +3,32 @@ export const CATEGORIES = [
     {
         id: 'islamic',
         label: 'Islamic',
-        colorClass: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300',
-        badgeColor: 'bg-emerald-500'
+        colorClass: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300',
+        badgeColor: 'bg-emerald-600'
     },
     {
         id: 'friends',
         label: 'Friends',
-        colorClass: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300',
-        badgeColor: 'bg-blue-500'
+        colorClass: 'bg-secondary-100 text-secondary-900 dark:bg-secondary-500/20 dark:text-secondary-100',
+        badgeColor: 'bg-secondary-500'
     },
     {
         id: 'colleagues',
         label: 'Colleagues',
-        colorClass: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300',
-        badgeColor: 'bg-purple-500'
+        colorClass: 'bg-primary-100 text-primary-900 dark:bg-primary-500/20 dark:text-primary-100',
+        badgeColor: 'bg-primary-500'
     },
     {
         id: 'network',
         label: 'Network',
-        colorClass: 'bg-gray-100 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300',
-        badgeColor: 'bg-gray-400'
+        colorClass: 'bg-neutral-100 text-neutral-900 dark:bg-neutral-500/20 dark:text-neutral-100',
+        badgeColor: 'bg-neutral-500'
     },
     {
         id: 'other',
         label: 'Other',
-        colorClass: 'bg-gray-100 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300',
-        badgeColor: 'bg-gray-400'
+        colorClass: 'bg-neutral-100 text-neutral-900 dark:bg-neutral-500/20 dark:text-neutral-100',
+        badgeColor: 'bg-neutral-400'
     }
 ] as const;
 
@@ -37,8 +37,8 @@ export const TEMPLATE_CATEGORIES = [
     {
         id: 'birthday',
         label: 'Birthday',
-        colorClass: 'bg-pink-100 text-pink-700 dark:bg-pink-500/20 dark:text-pink-300',
-        badgeColor: 'bg-pink-500'
+        colorClass: 'bg-warning/20 text-warning dark:bg-warning/10 dark:text-warning',
+        badgeColor: 'bg-warning'
     }
 ] as const;
 

@@ -132,14 +132,14 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
                     <div>
                         <h2 className="text-2xl font-black tracking-tight dark:text-white leading-none mb-1">{contact.firstName} {contact.lastName}</h2>
                         <div className="flex gap-2">
-                            {isBirthdayUpcoming && <span className="text-[10px] font-bold bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-300 px-2 py-0.5 rounded-full">🎂 Birthday Soon</span>}
-                            {!isBirthdayUpcoming && contact.snoozedUntil && <span className="text-[10px] font-bold bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-300 px-2 py-0.5 rounded-full">Snoozed</span>}
+                            {isBirthdayUpcoming && <span className="text-[10px] font-bold bg-warning/20 text-warning dark:bg-warning/10 dark:text-warning px-2 py-0.5 rounded-full">🎂 Birthday Soon</span>}
+                            {!isBirthdayUpcoming && contact.snoozedUntil && <span className="text-[10px] font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 px-2 py-0.5 rounded-full">Snoozed</span>}
                         </div>
                     </div>
                 </div>
                 <button
                     onClick={onClose}
-                    className="size-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 transition-colors"
+                    className="size-10 flex items-center justify-center rounded-full bg-neutral-100 dark:bg-white/5 hover:bg-neutral-200 dark:hover:bg-white/10 text-neutral-500 dark:text-neutral-400 transition-colors"
                 >
                     <span className="material-symbols-outlined">close</span>
                 </button>
@@ -148,7 +148,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
             {/* Content - Scrollable Templates */}
             <div className="flex-1 overflow-y-auto px-4 pt-2 pb-48 space-y-3 no-scrollbar content-scroll-mask">
                 <div className="flex items-center justify-between mb-4 mt-2">
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Select a Message</p>
+                    <p className="text-xs font-bold text-neutral-400 uppercase tracking-wider ml-1">Select a Message</p>
                     <div className="flex gap-1 overflow-x-auto no-scrollbar pb-1 max-w-[200px] sm:max-w-none">
                         {['all', 'islamic', 'friends', 'colleagues', 'network'].map(cat => (
                             <button
@@ -158,7 +158,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
                                     "px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide border transition-all whitespace-nowrap",
                                     templateFilter === cat
                                         ? "bg-primary text-white border-primary"
-                                        : "bg-transparent border-gray-200 dark:border-white/10 text-gray-400 dark:text-gray-500 hover:border-primary/50"
+                                        : "bg-transparent border-neutral-200 dark:border-white/10 text-neutral-400 dark:text-neutral-500 hover:border-primary/50"
                                 )}
                             >
                                 {cat}
@@ -177,7 +177,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
                             "w-full text-left p-5 rounded-2xl border transition-all duration-300 relative overflow-hidden group",
                             selectedTemplateId === t.id
                                 ? "border-primary/50 relative z-10"
-                                : "bg-white dark:bg-[#1E2130] border-transparent shadow-sm dark:shadow-neo-dark hover:scale-[1.01]"
+                                : "bg-surface-light dark:bg-surface-dark border-transparent shadow-sm dark:shadow-neo-dark hover:scale-[1.01]"
                         )}
                     >
                         {selectedTemplateId === t.id && (
@@ -187,12 +187,12 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
                             <div className="flex items-center justify-between mb-2">
                                 <span className={clsx(
                                     "text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-md",
-                                    t.category === 'birthday' && "bg-pink-100 text-pink-700 dark:bg-pink-500/10 dark:text-pink-300",
-                                    t.category === 'friends' && "bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300",
-                                    t.category === 'islamic' && "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300",
-                                    t.category === 'colleagues' && "bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-300",
-                                    t.category === 'network' && "bg-gray-100 text-gray-700 dark:bg-gray-700/30 dark:text-gray-300",
-                                    t.category === 'other' && "bg-gray-100 text-gray-600 dark:bg-gray-700/20 dark:text-gray-400"
+                                    t.category === 'birthday' && "bg-warning/20 text-warning dark:bg-warning/10 dark:text-warning",
+                                    t.category === 'friends' && "bg-secondary-100 text-secondary-700 dark:bg-secondary-500/10 dark:text-secondary-300",
+                                    t.category === 'islamic' && "bg-success/10 text-success dark:bg-success/20 dark:text-success",
+                                    t.category === 'colleagues' && "bg-primary-100 text-primary-700 dark:bg-primary-500/10 dark:text-primary-300",
+                                    t.category === 'network' && "bg-neutral-100 text-neutral-700 dark:bg-neutral-700/30 dark:text-neutral-300",
+                                    t.category === 'other' && "bg-neutral-100 text-neutral-600 dark:bg-neutral-700/20 dark:text-neutral-400"
                                 )}>
                                     {t.category}
                                 </span>
@@ -200,7 +200,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
                                     <span className="material-symbols-outlined text-primary text-xl animate-in zoom-in spin-in-180 duration-300">check_circle</span>
                                 )}
                             </div>
-                            <p className={clsx("text-base leading-relaxed", selectedTemplateId === t.id ? "text-gray-900 dark:text-white font-semibold" : "text-gray-600 dark:text-gray-400 font-medium")}>
+                            <p className={clsx("text-base leading-relaxed", selectedTemplateId === t.id ? "text-neutral-900 dark:text-white font-semibold" : "text-neutral-600 dark:text-neutral-400 font-medium")}>
                                 {t.text.replace('{NAME}', contact.firstName)}
                             </p>
                         </div>
@@ -208,7 +208,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
                 ))}
 
                 {filteredTemplates.length === 0 && (
-                    <p className="text-center text-gray-400 text-sm py-10">No templates found for this category.</p>
+                    <p className="text-center text-neutral-400 text-sm py-10">No templates found for this category.</p>
                 )}
             </div>
 
@@ -217,28 +217,28 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
                 {/* Preview Interaction */}
                 {selectedTemplateId && (
                     <div className="text-center mb-3 animate-in slide-in-from-bottom-2 fade-in">
-                        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Send via</span>
+                        <span className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Send via</span>
                     </div>
                 )}
 
                 <div className="grid grid-cols-[auto_1fr] gap-4 max-w-md mx-auto">
-                    <button onClick={handleSnooze} className="size-[58px] flex items-center justify-center rounded-2xl bg-white dark:bg-[#252836] text-gray-700 dark:text-gray-300 font-bold hover:bg-gray-50 dark:hover:bg-white/5 transition-all shadow-sm dark:shadow-neo-dark active:scale-95" title="Snooze">
+                    <button onClick={handleSnooze} className="size-[58px] flex items-center justify-center rounded-2xl bg-white dark:bg-[#252836] text-neutral-700 dark:text-neutral-300 font-bold hover:bg-neutral-50 dark:hover:bg-white/5 transition-all shadow-sm dark:shadow-neo-dark active:scale-95" title="Snooze">
                         <span className="material-symbols-outlined text-[28px]">snooze</span>
                     </button>
                     {selectedTemplateId ? (
                         <div className="flex gap-2 min-w-0">
-                            <button onClick={() => handleSendVia('sms')} className="flex-1 flex items-center justify-center rounded-2xl bg-gray-900 dark:bg-white text-white dark:text-black hover:scale-105 transition-all font-bold group shadow-lg active:scale-95" title="SMS">
+                            <button onClick={() => handleSendVia('sms')} className="flex-1 flex items-center justify-center rounded-2xl bg-neutral-900 dark:bg-white text-white dark:text-black hover:scale-105 transition-all font-bold group shadow-lg active:scale-95" title="SMS">
                                 <span className="material-symbols-outlined text-[24px]">sms</span>
                             </button>
                             <button onClick={() => handleSendVia('whatsapp')} className="flex-1 flex items-center justify-center rounded-2xl bg-[#25D366] text-white hover:scale-105 transition-all font-bold group shadow-lg active:scale-95" title="WhatsApp">
                                 <span className="material-symbols-outlined text-[24px]">chat</span>
                             </button>
-                            <button onClick={() => setShowEmailOptions(true)} className="flex-1 flex items-center justify-center rounded-2xl bg-blue-500 text-white hover:scale-105 transition-all font-bold group shadow-lg active:scale-95" title="Email">
+                            <button onClick={() => setShowEmailOptions(true)} className="flex-1 flex items-center justify-center rounded-2xl bg-secondary-500 text-white hover:scale-105 transition-all font-bold group shadow-lg active:scale-95" title="Email">
                                 <span className="material-symbols-outlined text-[24px]">mail</span>
                             </button>
                         </div>
                     ) : (
-                        <button onClick={handleMarkDone} className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-green-500 text-white font-bold hover:bg-green-600 transition-all shadow-lg shadow-green-500/30 active:scale-95">
+                        <button onClick={handleMarkDone} className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-success text-white font-bold hover:bg-success/90 transition-all shadow-lg shadow-success/30 active:scale-95">
                             <span className="material-symbols-outlined text-[22px]">check</span>
                             Mark Done
                         </button>
