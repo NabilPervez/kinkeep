@@ -133,7 +133,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
                         <h2 className="text-2xl font-black tracking-tight dark:text-white leading-none mb-1">{contact.firstName} {contact.lastName}</h2>
                         <div className="flex gap-2">
                             {isBirthdayUpcoming && <span className="text-[10px] font-bold bg-warning/20 text-warning dark:bg-warning/10 dark:text-warning px-2 py-0.5 rounded-full">🎂 Birthday Soon</span>}
-                            {!isBirthdayUpcoming && contact.snoozedUntil && <span className="text-[10px] font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 px-2 py-0.5 rounded-full">Snoozed</span>}
+                            {!isBirthdayUpcoming && contact.snoozedUntil && <span className="text-[10px] font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-400 px-2 py-0.5 rounded-full">Snoozed</span>}
                         </div>
                     </div>
                 </div>
@@ -188,11 +188,11 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
                                 <span className={clsx(
                                     "text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-md",
                                     t.category === 'birthday' && "bg-warning/20 text-warning dark:bg-warning/10 dark:text-warning",
-                                    t.category === 'friends' && "bg-secondary-100 text-secondary-700 dark:bg-secondary-500/10 dark:text-secondary-300",
+                                    t.category === 'friends' && "bg-secondary-100 text-secondary-900 dark:bg-secondary-500/10 dark:text-secondary-300",
                                     t.category === 'islamic' && "bg-success/10 text-success dark:bg-success/20 dark:text-success",
-                                    t.category === 'colleagues' && "bg-primary-100 text-primary-700 dark:bg-primary-500/10 dark:text-primary-300",
-                                    t.category === 'network' && "bg-neutral-100 text-neutral-700 dark:bg-neutral-700/30 dark:text-neutral-300",
-                                    t.category === 'other' && "bg-neutral-100 text-neutral-600 dark:bg-neutral-700/20 dark:text-neutral-400"
+                                    t.category === 'colleagues' && "bg-primary-100 text-primary-900 dark:bg-primary-500/10 dark:text-primary-300",
+                                    t.category === 'network' && "bg-neutral-100 text-neutral-900 dark:bg-neutral-700/30 dark:text-neutral-300",
+                                    t.category === 'other' && "bg-neutral-100 text-neutral-900 dark:bg-neutral-700/20 dark:text-neutral-400"
                                 )}>
                                     {t.category}
                                 </span>
