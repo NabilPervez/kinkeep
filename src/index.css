@@ -4,16 +4,41 @@
 
 @layer base {
   :root {
-    /* CSS HEX */
-    --steel-blue: #4f7cacff;
-    --frozen-water: #c0e0deff;
-    --jet-black: #162521ff;
-    --iron-grey: #3c474bff;
-    --soft-cyan: #9eefe5ff;
+    /* PRIMARY: Aurora Core (#00524D) */
+    --color-primary-100: #e0f2f0; 
+    --color-primary-200: #b3dfdb;
+    --color-primary-300: #80cbc4;
+    --color-primary-400: #4db6ac;
+    --color-primary-500: #00524D; /* Base */
+    --color-primary-600: #004d40;
+    --color-primary-700: #003d33;
+    --color-primary-800: #002d26;
+    --color-primary-900: #001b17;
+
+    /* SECONDARY: Glacial Mint (#48A89A) */
+    --color-secondary-100: #f0f8f7;
+    --color-secondary-500: #48A89A; /* Base */
+    --color-secondary-900: #1a3d38;
+
+    /* NEUTRAL: Midnight Moss (#053931) */
+    --color-neutral-100: #f1f4f4;
+    --color-neutral-500: #053931; /* Base */
+    --color-neutral-900: #021412;
+
+    /* SEMANTIC: Aurora-Harmonized */
+    --color-success: #2E7D32; /* Deep Emerald */
+    --color-warning: #C5A059; /* Muted Gold (Northern Lights glow) */
+    --color-danger:  #944848; /* Frosted Crimson */
+
+    /* UI CONSTANTS */
+    --shadow-color: rgba(0, 0, 0, 0.4);
+    --glass-effect: rgba(203, 239, 235, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-blur: 12px;
   }
 
   body {
-    @apply bg-background-light dark:bg-background-dark text-gray-900 dark:text-white font-display min-h-screen flex flex-col overflow-x-hidden;
+    @apply bg-neutral-900 text-primary-100 font-display min-h-screen flex flex-col overflow-x-hidden;
   }
 }
 
@@ -32,72 +57,55 @@
 }
 
 @keyframes blob {
-  0% {
-    transform: translate(0px, 0px) scale(1);
-  }
-
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-
-  100% {
-    transform: translate(0px, 0px) scale(1);
-  }
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
 }
 
 .animate-blob {
   animation: blob 7s infinite;
 }
 
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
+.animation-delay-2000 { animation-delay: 2s; }
+.animation-delay-4000 { animation-delay: 4s; }
 
-.animation-delay-4000 {
-  animation-delay: 4s;
-}
+/* Glassmorphism Utilities */
 
+/* General Glass Panel */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: var(--glass-effect);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 30px var(--shadow-color);
 }
 
-.dark .glass-panel {
-  background: rgba(22, 37, 33, 0.7);
-  /* darker jet black/emerald tint */
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-/* For cards floating on top of the aurora */
+/* Specific Card Variation */
 .glass-card {
-  background: rgba(255, 255, 255, 0.65);
+  background: rgba(5, 57, 49, 0.6); /* Semi-transparent Deep Forest */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(72, 168, 154, 0.2); /* Hint of Glacial Mint */
+  box-shadow: 0 4px 30px var(--shadow-color);
+  transition: all 0.3s ease;
 }
 
-.dark .glass-card {
-  background: rgba(30, 30, 35, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+.glass-card:hover {
+  border-color: var(--color-secondary-500);
+  box-shadow: 0 0 20px rgba(72, 168, 154, 0.3); /* Aurora glow */
 }
 
-/* Input fields with glass effect */
+/* Input Fields */
 .glass-input {
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(0, 27, 23, 0.4); /* Darker for input contrast */
   backdrop-filter: blur(4px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-primary-100);
+  transition: border-color 0.2s;
 }
 
-.dark .glass-input {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
+.glass-input:focus {
+  border-color: var(--color-secondary-500);
+  outline: none;
 }

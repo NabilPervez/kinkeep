@@ -8,51 +8,58 @@ export default {
   theme: {
     extend: {
       colors: {
-        'steel-blue': 'var(--steel-blue)',
-        'frozen-water': 'var(--frozen-water)',
-        'jet-black': 'var(--jet-black)',
-        'iron-grey': 'var(--iron-grey)',
-        'soft-cyan': 'var(--soft-cyan)',
         primary: {
-          DEFAULT: 'var(--steel-blue)',
-          dark: '#3a5b80', // Darker shade of steel blue
-          light: '#658dbd', // Lighter shade of steel blue
+          100: 'var(--color-primary-100)',
+          200: 'var(--color-primary-200)',
+          300: 'var(--color-primary-300)',
+          400: 'var(--color-primary-400)',
+          500: 'var(--color-primary-500)',
+          600: 'var(--color-primary-600)',
+          700: 'var(--color-primary-700)',
+          800: 'var(--color-primary-800)',
+          900: 'var(--color-primary-900)',
+          DEFAULT: 'var(--color-primary-500)',
         },
         secondary: {
-          DEFAULT: 'var(--soft-cyan)',
+          100: 'var(--color-secondary-100)',
+          500: 'var(--color-secondary-500)',
+          900: 'var(--color-secondary-900)',
+          DEFAULT: 'var(--color-secondary-500)',
         },
-        accent: {
-          yellow: '#f2e863', // Keeping original accents for now
-          gold: '#f2cd60',
+        neutral: {
+          100: 'var(--color-neutral-100)',
+          500: 'var(--color-neutral-500)',
+          900: 'var(--color-neutral-900)',
+          DEFAULT: 'var(--color-neutral-500)',
         },
+        success: 'var(--color-success)',
+        warning: 'var(--color-warning)',
+        danger: 'var(--color-danger)',
+
+        // Aliases for compatibility/semantic usage
         background: {
-          light: 'var(--frozen-water)',
-          dark: 'var(--jet-black)',
+          light: 'var(--color-neutral-100)',
+          dark: 'var(--color-neutral-900)',
+          DEFAULT: 'var(--color-neutral-900)',
         },
         surface: {
           light: '#FFFFFF',
-          dark: 'var(--iron-grey)',
+          dark: 'var(--color-primary-900)',
         }
       },
       backgroundImage: {
-        'gradient-top': 'linear-gradient(0deg, var(--steel-blue), var(--frozen-water), var(--jet-black), var(--iron-grey), var(--soft-cyan))',
-        'gradient-right': 'linear-gradient(90deg, var(--steel-blue), var(--frozen-water), var(--jet-black), var(--iron-grey), var(--soft-cyan))',
-        'gradient-bottom': 'linear-gradient(180deg, var(--steel-blue), var(--frozen-water), var(--jet-black), var(--iron-grey), var(--soft-cyan))',
-        'gradient-left': 'linear-gradient(270deg, var(--steel-blue), var(--frozen-water), var(--jet-black), var(--iron-grey), var(--soft-cyan))',
-        'gradient-top-right': 'linear-gradient(45deg, var(--steel-blue), var(--frozen-water), var(--jet-black), var(--iron-grey), var(--soft-cyan))',
-        'gradient-bottom-right': 'linear-gradient(135deg, var(--steel-blue), var(--frozen-water), var(--jet-black), var(--iron-grey), var(--soft-cyan))',
-        'gradient-top-left': 'linear-gradient(225deg, var(--steel-blue), var(--frozen-water), var(--jet-black), var(--iron-grey), var(--soft-cyan))',
-        'gradient-bottom-left': 'linear-gradient(315deg, var(--steel-blue), var(--frozen-water), var(--jet-black), var(--iron-grey), var(--soft-cyan))',
-        'gradient-radial': 'radial-gradient(var(--steel-blue), var(--frozen-water), var(--jet-black), var(--iron-grey), var(--soft-cyan))',
+        'gradient-aurora': 'linear-gradient(135deg, var(--color-primary-900), var(--color-neutral-500), var(--color-primary-600))',
+        'gradient-glow': 'radial-gradient(circle at center, var(--color-secondary-500), transparent 70%)',
       },
       fontFamily: {
         display: ['Outfit', 'sans-serif'],
         body: ['Inter', 'sans-serif'],
       },
       boxShadow: {
-        'neo-dark': '5px 5px 10px #0a0c12, -5px -5px 10px #22263e',
-        'neo-light': '5px 5px 10px #a3bfbd, -5px -5px 10px #ddffff', // Adjusted for frozen-water
-        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+        'neo-dark': '5px 5px 10px #021412, -5px -5px 10px #053931',
+        'neo-light': '5px 5px 10px #d1d9d9, -5px -5px 10px #ffffff',
+        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+        'aurora': '0 0 20px rgba(72, 168, 154, 0.3)',
       },
       borderRadius: {
         "DEFAULT": "0.25rem",
