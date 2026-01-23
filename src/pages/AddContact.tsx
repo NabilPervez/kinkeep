@@ -81,6 +81,25 @@ export const AddContact: React.FC = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    // Prevent editing system contacts
+    if (existingContact?.isSystem) {
+        return (
+            <div className="flex-1 flex flex-col items-center justify-center p-4 text-center h-screen">
+                <div className="size-16 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center mb-4">
+                    <span className="material-symbols-outlined text-3xl text-gray-400">lock</span>
+                </div>
+                <h2 className="text-xl font-bold mb-2">System Contact</h2>
+                <p className="text-gray-500 font-medium mb-6">This contact is permanent and cannot be modified or deleted.</p>
+                <button
+                    onClick={() => navigate(-1)}
+                    className="px-6 py-2.5 bg-primary text-black font-bold rounded-xl hover:bg-primary/90 transition-all"
+                >
+                    Go Back
+                </button>
+            </div>
+        );
+    }
+
     return (
         <div className="flex-1 flex flex-col gap-6 p-4 pb-24">
 

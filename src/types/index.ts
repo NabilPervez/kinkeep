@@ -24,6 +24,7 @@ export interface Contact {
     // Computed fields (not necessarily in DB, but useful)
     score?: number;
     isBirthdayUpcoming?: boolean;
+    isSystem?: boolean; // Permanent/Immutable contact
 }
 
 export interface Template {

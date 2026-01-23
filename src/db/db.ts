@@ -22,6 +22,51 @@ export class KinKeepDB extends Dexie {
             });
         });
 
+        this.version(3).stores({
+            contacts: 'id, firstName, lastName, frequencyDays, lastContacted, birthday, snoozedUntil, isArchived, category, isSystem, *tags',
+            templates: 'id, category, isDefault'
+        }).upgrade(async trans => {
+            const contacts = trans.table<Contact, string>("contacts");
+
+            // 1. Feedback Contact
+            const feedbackExists = await contacts.get('contact_system_feedback');
+            if (!feedbackExists) {
+                await contacts.add({
+                    id: 'contact_system_feedback',
+                    firstName: 'Feedback',
+                    lastName: '(App)',
+                    phoneNumber: '',
+                    email: 'nabilpervezconsulting+feedback@gmail.com',
+                    frequencyDays: 365,
+                    lastContacted: Date.now(),
+                    category: 'other',
+                    isArchived: false,
+                    tags: ['System'],
+                    isSystem: true,
+                    notes: 'Permanent contact for app feedback.'
+                });
+            }
+
+            // 2. Nabil Pervez Consulting
+            const npcExists = await contacts.get('contact_system_npc');
+            if (!npcExists) {
+                await contacts.add({
+                    id: 'contact_system_npc',
+                    firstName: 'Nabil Pervez',
+                    lastName: 'Consulting',
+                    phoneNumber: '',
+                    email: 'nabilpervezconsulting+kinkeep@gmail.com',
+                    frequencyDays: 365, // Yearly check-in?
+                    lastContacted: Date.now(),
+                    category: 'network',
+                    isArchived: false,
+                    tags: ['System', 'Support'],
+                    isSystem: true,
+                    notes: 'Official support contact.'
+                });
+            }
+        });
+
         // Seed default templates - CLEAR old ones first if needed, but 'populate' only runs on creation.
         // Since we are upgrading, 'populate' won't run again for existing users.
         // We need to run a migration or just force add.

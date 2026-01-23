@@ -249,16 +249,22 @@ export const Contacts: React.FC = () => {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-1">
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            sounds.play('click');
-                                                            navigate(`/add-contact/${contact.id}`);
-                                                        }}
-                                                        className="size-8 flex items-center justify-center rounded-full text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
-                                                    >
-                                                        <span className="material-symbols-outlined text-[18px]">edit</span>
-                                                    </button>
+                                                    {contact.isSystem ? (
+                                                        <div className="size-8 flex items-center justify-center rounded-full text-gray-400 opacity-50 cursor-not-allowed" title="System Contact">
+                                                            <span className="material-symbols-outlined text-[18px]">lock</span>
+                                                        </div>
+                                                    ) : (
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                sounds.play('click');
+                                                                navigate(`/add-contact/${contact.id}`);
+                                                            }}
+                                                            className="size-8 flex items-center justify-center rounded-full text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+                                                        >
+                                                            <span className="material-symbols-outlined text-[18px]">edit</span>
+                                                        </button>
+                                                    )}
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
