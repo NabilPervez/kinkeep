@@ -27,7 +27,9 @@ export const Contacts: React.FC = () => {
     const filteredContacts = contacts.filter(c => {
         const full = `${c.firstName} ${c.lastName}`.toLowerCase();
         const matchesSearch = full.includes(search.toLowerCase());
-        const matchesCategory = filterCategory === 'all' || c.category === filterCategory;
+        // @ts-ignore
+        const cats = c.categories || (c.category ? [c.category] : ['other']);
+        const matchesCategory = filterCategory === 'all' || cats.includes(filterCategory);
         const matchesFrequency = filterFrequency === 'all' || c.frequencyDays.toString() === filterFrequency;
 
         return matchesSearch && matchesCategory && matchesFrequency;
@@ -57,14 +59,18 @@ export const Contacts: React.FC = () => {
 
     const handleExportCSV = () => {
         sounds.play('click');
-        const csv = Papa.unparse(filteredContacts.map(c => ({
-            FirstName: c.firstName,
-            LastName: c.lastName,
-            Phone: c.phoneNumber,
-            Category: c.category,
-            Frequency: c.frequencyDays,
-            Birthday: c.birthday
-        })));
+        const csv = Papa.unparse(filteredContacts.map(c => {
+            // @ts-ignore
+            const cats = c.categories || (c.category ? [c.category] : []);
+            return {
+                FirstName: c.firstName,
+                LastName: c.lastName,
+                Phone: c.phoneNumber,
+                Categories: cats.join(';'),
+                Frequency: c.frequencyDays,
+                Birthday: c.birthday
+            };
+        }));
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
@@ -76,7 +82,9 @@ export const Contacts: React.FC = () => {
         sounds.play('click');
         let vcardString = '';
         filteredContacts.forEach(c => {
-            vcardString += `BEGIN:VCARD\nVERSION:3.0\nFN:${c.firstName} ${c.lastName}\nN:${c.lastName};${c.firstName};;;\nTEL;TYPE=CELL:${c.phoneNumber}\nCATEGORIES:${c.category}\nEND:VCARD\n`;
+            // @ts-ignore
+            const cats = c.categories || (c.category ? [c.category] : []);
+            vcardString += `BEGIN:VCARD\nVERSION:3.0\nFN:${c.firstName} ${c.lastName}\nN:${c.lastName};${c.firstName};;;\nTEL;TYPE=CELL:${c.phoneNumber}\nCATEGORIES:${cats.join(',')}\nEND:VCARD\n`;
         });
         const blob = new Blob([vcardString], { type: 'text/vcard;charset=utf-8;' });
         const link = document.createElement('a');
@@ -110,8 +118,10 @@ export const Contacts: React.FC = () => {
         return cat?.colorClass ?? 'bg-neutral-950/60 text-neutral-400 border border-neutral-700/30 backdrop-blur-md';
     };
 
-    const getCategoryBadgeColor = (catId?: string) => {
-        const cat = CATEGORIES.find(c => c.id === catId);
+    const getCategoryBadgeColor = (cats?: string[]) => {
+        // Use first category color or fallback
+        if (!cats || cats.length === 0) return 'bg-neutral-500';
+        const cat = CATEGORIES.find(c => c.id === cats[0]);
         return cat?.badgeColor ?? 'bg-neutral-500';
     };
 
@@ -219,22 +229,31 @@ export const Contacts: React.FC = () => {
                                     {groupedContacts[letter].map(contact => {
                                         const freq = getFrequencyLabel(contact.frequencyDays);
                                         const dayInfo = getDayLabel(contact.preferredDayOfWeek);
+                                        // @ts-ignore
+                                        const displayCats = contact.categories || (contact.category ? [contact.category] : []);
+
                                         return (
                                             <div key={contact.id} className="group flex items-center justify-between p-3 rounded-2xl glass-card active:scale-[0.99] transition-all hover:shadow-md">
                                                 <div className="flex items-center gap-3 flex-1 min-w-0" onClick={() => setSelectedContactId(contact.id)}>
                                                     <div className={clsx(
                                                         "flex items-center justify-center rounded-full size-12 font-bold text-lg shrink-0 text-white",
-                                                        getCategoryBadgeColor(contact.category)
+                                                        getCategoryBadgeColor(displayCats)
                                                     )}>
                                                         {contact.firstName[0]}
                                                     </div>
                                                     <div className="flex flex-col min-w-0 gap-1.5">
                                                         <h4 className="font-bold text-base truncate leading-none pt-0.5">{contact.firstName} {contact.lastName}</h4>
                                                         <div className="flex flex-wrap items-center gap-1.5">
-                                                            {/* Category Label */}
-                                                            <span className={clsx("text-[10px] uppercase font-bold px-1.5 py-0.5 rounded", getCategoryStyle(contact.category))}>
-                                                                {CATEGORIES.find(c => c.id === contact.category)?.label || 'Other'}
-                                                            </span>
+                                                            {/* Category Labels */}
+                                                            {displayCats.slice(0, 3).map((catId: string) => (
+                                                                <span key={catId} className={clsx("text-[10px] uppercase font-bold px-1.5 py-0.5 rounded", getCategoryStyle(catId))}>
+                                                                    {CATEGORIES.find(c => c.id === catId)?.label || 'Other'}
+                                                                </span>
+                                                            ))}
+                                                            {displayCats.length > 3 && (
+                                                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white/10 text-white/50">+{displayCats.length - 3}</span>
+                                                            )}
+
                                                             {/* Frequency Label */}
                                                             <span className={clsx("text-[10px] font-bold px-1.5 py-0.5 rounded", freq.color)}>
                                                                 {freq.label}

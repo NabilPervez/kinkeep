@@ -24,7 +24,7 @@ export const AddContact: React.FC = () => {
         frequency: '14', // Default to 2 weeks
         birthday: '',
         preferredDayOfWeek: '' as string, // "0"-"6" or ""
-        category: 'friends' // default
+        categories: ['friends'] // default
     });
 
     // Populate form when data loads
@@ -38,7 +38,8 @@ export const AddContact: React.FC = () => {
                 frequency: existingContact.frequencyDays.toString(),
                 birthday: existingContact.birthday || '',
                 preferredDayOfWeek: existingContact.preferredDayOfWeek !== undefined ? existingContact.preferredDayOfWeek.toString() : '',
-                category: existingContact.category || 'friends'
+                // @ts-ignore - backward compat if needed, though db migration should handle it
+                categories: existingContact.categories || (existingContact.category ? [existingContact.category] : ['friends'])
             });
         }
     }, [existingContact]);
@@ -54,7 +55,7 @@ export const AddContact: React.FC = () => {
             frequencyDays: parseInt(formData.frequency),
             birthday: formData.birthday || undefined,
             preferredDayOfWeek: formData.preferredDayOfWeek ? parseInt(formData.preferredDayOfWeek) : undefined,
-            category: formData.category as any,
+            categories: formData.categories,
             // Preserve existing logic fields if editing
             lastContacted: existingContact ? existingContact.lastContacted : Date.now(),
             isArchived: existingContact ? existingContact.isArchived : false,
@@ -81,6 +82,7 @@ export const AddContact: React.FC = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    // ... (System contact check remains same) ...
     // Prevent editing system contacts
     if (existingContact?.isSystem) {
         return (
@@ -99,6 +101,21 @@ export const AddContact: React.FC = () => {
             </div>
         );
     }
+
+    const toggleCategory = (catId: string) => {
+        setFormData(prev => {
+            const exists = prev.categories.includes(catId);
+            if (exists) {
+                // Don't allow removing the last category? Or maybe allow partial state?
+                // Let's allow removing but default to 'other' if empty on submit?
+                // Actually user request implies >1 is fine. 0 might be weird.
+                // Let's just toggle.
+                return { ...prev, categories: prev.categories.filter(c => c !== catId) };
+            } else {
+                return { ...prev, categories: [...prev.categories, catId] };
+            }
+        });
+    };
 
     return (
         <div className="flex-1 flex flex-col gap-6 p-4 pb-24">
@@ -163,16 +180,16 @@ export const AddContact: React.FC = () => {
 
                     {/* Category Selector */}
                     <div className="space-y-3">
-                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300" htmlFor="category">Category</label>
+                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300" htmlFor="category">Categories</label>
                         <div className="grid grid-cols-3 gap-2">
                             {CATEGORIES.map(cat => (
                                 <button
                                     key={cat.id}
                                     type="button"
-                                    onClick={() => setFormData(prev => ({ ...prev, category: cat.id }))}
+                                    onClick={() => toggleCategory(cat.id)}
                                     className={clsx(
                                         "py-2.5 rounded-xl text-sm font-bold capitalize transition-all border",
-                                        formData.category === cat.id
+                                        formData.categories.includes(cat.id)
                                             ? clsx(cat.colorClass, "scale-105 shadow-md border-transparent")
                                             : "glass-input border-gray-200 dark:border-white/10 text-gray-500 hover:bg-white/10"
                                     )}

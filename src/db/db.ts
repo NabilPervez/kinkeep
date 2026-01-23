@@ -39,7 +39,7 @@ export class KinKeepDB extends Dexie {
                     email: 'nabilpervezconsulting+feedback@gmail.com',
                     frequencyDays: 365,
                     lastContacted: Date.now(),
-                    category: 'other',
+                    categories: ['other'],
                     isArchived: false,
                     tags: ['System'],
                     isSystem: true,
@@ -58,13 +58,33 @@ export class KinKeepDB extends Dexie {
                     email: 'nabilpervezconsulting+kinkeep@gmail.com',
                     frequencyDays: 365, // Yearly check-in?
                     lastContacted: Date.now(),
-                    category: 'network',
+                    categories: ['network'],
                     isArchived: false,
                     tags: ['System', 'Support'],
                     isSystem: true,
                     notes: 'Official support contact.'
                 });
             }
+        }).upgrade(async trans => {
+            const contacts = trans.table<Contact, string>("contacts");
+            // ... existing system contacts logic ...
+        });
+
+        this.version(4).stores({
+            contacts: 'id, firstName, lastName, frequencyDays, lastContacted, birthday, snoozedUntil, isArchived, *categories, isSystem, *tags',
+            templates: 'id, category, isDefault'
+        }).upgrade(async trans => {
+            return trans.table("contacts").toCollection().modify(contact => {
+                // @ts-ignore - accessing old property
+                if (contact.category) {
+                    // @ts-ignore
+                    contact.categories = [contact.category];
+                    // @ts-ignore
+                    delete contact.category;
+                } else if (!contact.categories) {
+                    contact.categories = ['other'];
+                }
+            });
         });
 
         // Seed default templates - CLEAR old ones first if needed, but 'populate' only runs on creation.

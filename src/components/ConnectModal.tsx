@@ -24,17 +24,34 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({ contactId, onClose }
     const templates = useLiveQuery(() => db.templates.toArray()) || [];
 
     // Sort templates logic: Birthday first if birthday.
+    // Sort templates logic: 
+    // 1. Birthday (if upcoming)
+    // 2. Matching Categories (if any)
+    // 3. Others
     const sortedTemplates = [...templates].sort((a, b) => {
         if (!contact) return 0;
+
+        // @ts-ignore
+        const contactCats = contact.categories || (contact.category ? [contact.category] : []);
+
         const isBday = contact.isBirthdayUpcoming;
+        const aMatches = contactCats.includes(a.category);
+        const bMatches = contactCats.includes(b.category);
+
+        // Birthday priority override
         if (isBday) {
             if (a.category === 'birthday' && b.category !== 'birthday') return -1;
             if (a.category !== 'birthday' && b.category === 'birthday') return 1;
         } else {
-            // De-prioritize birthday
+            // Deprioritize birthday if not birthday
             if (a.category === 'birthday' && b.category !== 'birthday') return 1;
             if (a.category !== 'birthday' && b.category === 'birthday') return -1;
         }
+
+        // Match contact categories
+        if (aMatches && !bMatches) return -1;
+        if (!aMatches && bMatches) return 1;
+
         return 0;
     });
 

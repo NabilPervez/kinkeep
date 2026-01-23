@@ -20,7 +20,7 @@ export const Planning: React.FC = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [selectedFrequency, setSelectedFrequency] = useState<number | null>(null);
     const [selectedDay, setSelectedDay] = useState<number | null>(null);
-    const [category, setCategory] = useState<string | null>(null);
+    const [categories, setCategories] = useState<string[]>([]);
 
     const currentContact = allContacts[currentIndex];
 
@@ -28,7 +28,8 @@ export const Planning: React.FC = () => {
     useEffect(() => {
         setSelectedFrequency(currentContact?.frequencyDays || null); // Pre-fill if exists
         setSelectedDay(currentContact?.preferredDayOfWeek ?? null);
-        setCategory(currentContact?.category || null);
+        // @ts-ignore
+        setCategories(currentContact?.categories || (currentContact?.category ? [currentContact.category] : []));
     }, [currentContact]);
 
     const handleSave = async () => {
@@ -39,7 +40,8 @@ export const Planning: React.FC = () => {
 
         if (selectedFrequency !== null) updates.frequencyDays = selectedFrequency;
         if (selectedDay !== null) updates.preferredDayOfWeek = selectedDay;
-        if (category) updates.category = category as Contact['category'];
+        // Check if categories changed? Actually we just overwrite.
+        if (categories.length > 0) updates.categories = categories;
 
         if (Object.keys(updates).length > 0) {
             await db.contacts.update(currentContact.id, updates);
@@ -55,6 +57,13 @@ export const Planning: React.FC = () => {
         // Just move to next index. If it goes out of bounds, 
         // currentContact becomes undefined and the 'All Done' screen renders.
         setCurrentIndex(prev => prev + 1);
+    };
+
+    const toggleCategory = (catId: string) => {
+        setCategories(prev => {
+            if (prev.includes(catId)) return prev.filter(c => c !== catId);
+            return [...prev, catId];
+        });
     };
 
     if (!allContacts.length) return null;
@@ -117,18 +126,18 @@ export const Planning: React.FC = () => {
                 <div className="w-full space-y-6 pb-20">
                     {/* 1. Category */}
                     <div className="space-y-2">
-                        <h3 className="text-white/60 text-xs font-bold uppercase tracking-widest pl-1">Category</h3>
+                        <h3 className="text-white/60 text-xs font-bold uppercase tracking-widest pl-1">Categories</h3>
                         <div className="flex flex-wrap gap-2">
                             {CATEGORIES.map(cat => (
                                 <button
                                     key={cat.id}
                                     onClick={() => {
-                                        setCategory(cat.id);
+                                        toggleCategory(cat.id);
                                         sounds.play('click');
                                     }}
                                     className={clsx(
                                         "px-4 py-2 rounded-xl text-sm font-bold transition-all border",
-                                        category === cat.id
+                                        categories.includes(cat.id)
                                             ? clsx(cat.colorClass, "scale-105 shadow-xl")
                                             : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"
                                     )}
@@ -189,7 +198,7 @@ export const Planning: React.FC = () => {
 
                     <button
                         onClick={handleSave}
-                        disabled={selectedFrequency === null || selectedDay === null || !category}
+                        disabled={selectedFrequency === null || selectedDay === null || categories.length === 0}
                         className="w-full h-14 rounded-2xl bg-white text-black font-black text-lg shadow-xl shadow-white/10 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-30 disabled:pointer-events-none mt-4"
                     >
                         Save & Next
