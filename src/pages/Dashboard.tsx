@@ -67,6 +67,7 @@ export const Dashboard: React.FC = () => {
         const due = getNextDueDate(c);
         const diff = differenceInCalendarDays(due, now);
 
+        if (diff === -1) return 'Missed Yesterday';
         if (diff < 0) return `${Math.abs(diff)}d ago`;
         if (isToday(due)) return 'Today';
         if (isTomorrow(due)) return 'Tomorrow';
