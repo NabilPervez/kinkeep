@@ -65,8 +65,7 @@ export class KinKeepDB extends Dexie {
                     notes: 'Official support contact.'
                 });
             }
-        }).upgrade(async trans => {
-            const contacts = trans.table<Contact, string>("contacts");
+        }).upgrade(async _trans => {
             // ... existing system contacts logic ...
         });
 
