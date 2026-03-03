@@ -23,7 +23,7 @@ export const Dashboard: React.FC = () => {
     const contacts = useLiveQuery(() => db.contacts.toArray()) || [];
 
     // Filter by category first - normalize category checks
-    const filteredByCat = contacts.filter(c => categoryFilter === 'all' || c.category === categoryFilter);
+    const filteredByCat = contacts.filter(c => categoryFilter === 'all' || c.categories?.includes(categoryFilter));
     const sortedContacts = sortContacts(filteredByCat);
 
     const showOnboarding = contacts.length === 0 && !hasSeenOnboarding;
@@ -113,10 +113,11 @@ export const Dashboard: React.FC = () => {
                                     Focus
                                 </span>
                                 {(() => {
-                                    const catObj = CATEGORIES.find(cat => cat.id === focusContact.category) || CATEGORIES.find(cat => cat.id === 'other');
+                                    const primaryCategory = focusContact.categories?.[0] || 'other';
+                                    const catObj = CATEGORIES.find(cat => cat.id === primaryCategory) || CATEGORIES.find(cat => cat.id === 'other');
                                     return (
                                         <span className={clsx("text-[10px] font-bold px-2 py-0.5 rounded shadow-sm", catObj?.colorClass)}>
-                                            {catObj?.label || focusContact.category || 'Other'}
+                                            {catObj?.label || primaryCategory || 'Other'}
                                         </span>
                                     );
                                 })()}
@@ -190,10 +191,11 @@ export const Dashboard: React.FC = () => {
                                         <h4 className="text-white font-bold truncate">{c.firstName} {c.lastName}</h4>
                                         <div className="flex items-center gap-2 mt-0.5">
                                             {(() => {
-                                                const catObj = CATEGORIES.find(cat => cat.id === c.category) || CATEGORIES.find(cat => cat.id === 'other');
+                                                const primaryCategory = c.categories?.[0] || 'other';
+                                                const catObj = CATEGORIES.find(cat => cat.id === primaryCategory) || CATEGORIES.find(cat => cat.id === 'other');
                                                 return (
                                                     <span className={clsx("text-[10px] font-bold px-2 py-0.5 rounded shadow-sm", catObj?.colorClass)}>
-                                                        {catObj?.label || c.category || 'Other'}
+                                                        {catObj?.label || primaryCategory || 'Other'}
                                                     </span>
                                                 );
                                             })()}

@@ -49,6 +49,7 @@ export const parseCSV = (file: File): Promise<ParseResult> => {
                             snoozedUntil: undefined,
                             lastContacted: 0,
                             isArchived: false,
+                            categories: ['other'],
                             tags: ['Imported'],
                             email: row['E-mail Address'] || row['Email'] || row['Email Address'] || ''
                         });
@@ -164,6 +165,7 @@ export const parseVCF = async (file: File): Promise<ParseResult> => {
                 frequencyDays: 30,
                 lastContacted: 0,
                 isArchived: false,
+                categories: ['other'],
                 tags: ['Imported'],
                 email: email || '',
             });
