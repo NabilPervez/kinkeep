@@ -16,8 +16,8 @@ export interface Contact {
     snoozedUntil?: number;    // Unix Timestamp (ignore in sort until this passes)
     isArchived: boolean;
 
-    categories: string[];     // ['islamic', 'friends'] - Replaces singular category
-    // category?: string;     // Deprecated
+    categories?: string[];     // ['islamic', 'friends'] - Replaces singular category
+    category?: string;     // Deprecated
     tags: string[];           // ["Family", "Work"]
     preferredDayOfWeek?: number; // 0 = Sunday, 1 = Monday, etc.
     notes?: string;

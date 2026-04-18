@@ -71,7 +71,7 @@ export const parseVCF = async (file: File): Promise<ParseResult> => {
     let text = '';
     try {
         text = await file.text();
-    } catch (e) {
+    } catch {
         return { contacts: [], errors: ['Failed to read file text'] };
     }
 

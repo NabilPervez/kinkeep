@@ -26,12 +26,12 @@ export class KinKeepDB extends Dexie {
             contacts: 'id, firstName, lastName, frequencyDays, lastContacted, birthday, snoozedUntil, isArchived, category, isSystem, *tags',
             templates: 'id, category, isDefault'
         }).upgrade(async trans => {
-            const contacts = trans.table<Contact, string>("contacts");
+            const contactsTable = trans.table<Contact, string>("contacts");
 
             // 1. Feedback Contact
-            const feedbackExists = await contacts.get('contact_system_feedback');
+            const feedbackExists = await contactsTable.get('contact_system_feedback');
             if (!feedbackExists) {
-                await contacts.add({
+                await contactsTable.add({
                     id: 'contact_system_feedback',
                     firstName: 'Feedback',
                     lastName: '(App)',
@@ -48,9 +48,9 @@ export class KinKeepDB extends Dexie {
             }
 
             // 2. Nabil Pervez Consulting
-            const npcExists = await contacts.get('contact_system_npc');
+            const npcExists = await contactsTable.get('contact_system_npc');
             if (!npcExists) {
-                await contacts.add({
+                await contactsTable.add({
                     id: 'contact_system_npc',
                     firstName: 'Nabil Pervez',
                     lastName: 'Consulting',
@@ -65,8 +65,7 @@ export class KinKeepDB extends Dexie {
                     notes: 'Official support contact.'
                 });
             }
-        }).upgrade(async trans => {
-            const contacts = trans.table<Contact, string>("contacts");
+        }).upgrade(async () => {
             // ... existing system contacts logic ...
         });
 

@@ -91,6 +91,55 @@ export const ImportWizard: React.FC = () => {
         }
     };
 
+    const handleNativeContactPicker = async () => {
+        try {
+            const supported = 'contacts' in navigator && 'ContactsManager' in window;
+            if (!supported) {
+                alert('Contact picker is not supported on this device or browser. Please use the file upload instead.');
+                return;
+            }
+
+            const props = ['name', 'tel', 'email'];
+            const opts = { multiple: true };
+
+            // @ts-expect-error - navigator.contacts is not in standard TS types yet
+            const contacts = await navigator.contacts.select(props, opts);
+
+            if (contacts && contacts.length > 0) {
+                const parsed: Contact[] = contacts.map((c: { name?: string[], tel?: string[], email?: string[] }) => {
+                    const name = c.name?.[0] || '';
+                    let firstName = name;
+                    let lastName = '';
+                    const parts = name.split(' ');
+                    if (parts.length > 1) {
+                        firstName = parts[0];
+                        lastName = parts.slice(1).join(' ');
+                    }
+
+                    return {
+                        id: crypto.randomUUID(),
+                        firstName: firstName || 'Unknown',
+                        lastName: lastName,
+                        phoneNumber: c.tel?.[0] || '',
+                        email: c.email?.[0] || '',
+                        frequencyDays: 30, // Default until user assigns
+                        lastContacted: 0,
+                        isArchived: false,
+                        category: 'other',
+                        tags: ['Imported']
+                    };
+                });
+
+                setParsedContacts(parsed);
+                setSelectedIds(new Set());
+                setStep(2);
+            }
+        } catch (err) {
+            console.error(err);
+            // Ignore error if user just cancelled
+        }
+    };
+
     const processFile = async (f: File) => {
         setIsParsing(true);
         try {
@@ -347,8 +396,18 @@ export const ImportWizard: React.FC = () => {
                         />
                         {isParsing && <p className="text-primary font-bold animate-pulse">Parsing file...</p>}
 
-                        <div className="max-w-xs text-center text-sm text-gray-500">
-                            <p>Export your contacts from Google, iCloud, or Outlook as a CSV or vCard file.</p>
+                        {('contacts' in navigator && 'ContactsManager' in window) && (
+                            <button
+                                onClick={handleNativeContactPicker}
+                                className="w-full max-w-xs h-14 bg-primary/10 hover:bg-primary/20 text-primary font-bold rounded-xl border-2 border-primary/20 shadow-sm transition-all flex items-center justify-center gap-2"
+                            >
+                                <span className="material-symbols-outlined">contacts</span>
+                                Pick from Phone
+                            </button>
+                        )}
+
+                        <div className="max-w-xs text-center text-sm text-gray-500 mt-2">
+                            <p>Or export your contacts from Google, iCloud, or Outlook as a CSV or vCard file.</p>
                         </div>
                     </div>
                 )}
